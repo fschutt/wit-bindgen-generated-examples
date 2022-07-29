@@ -1,0 +1,18 @@
+[package]
+name = "wit_bindgen_examples_wasmer2"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[lib]
+path = "lib.rs"
+
+[dependencies.wasmer]
+version = "2.3.0"
+
+[dependencies.wit-bindgen-wasmer]
+git = "https://github.com/wasmerio/wit-bindgen"
+branch = "silwol/wasmer2"

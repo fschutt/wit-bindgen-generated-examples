@@ -1,0 +1,17 @@
+pub mod char;
+pub mod conventions;
+pub mod empty;
+pub mod flags;
+pub mod floats;
+pub mod integers;
+pub mod lists;
+pub mod many_arguments;
+pub mod records;
+pub mod resource;
+pub mod simple_functions;
+pub mod simple_lists;
+pub mod small_anonymous;
+pub mod smoke;
+pub mod strings;
+pub mod unions;
+pub mod variants;
