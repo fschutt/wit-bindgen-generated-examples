@@ -6,7 +6,7 @@ rm -rf wasmer2 wasmer3
 
 create_project() {
     project_name=$1
-    cargo new --edition 2018 --lib "$project_name"
+    cargo new --edition 2018 --name wit_bindgen_examples_"$project_name" --lib "$project_name"
     rm -rf "$project_name"/src
 
     cat >> "$project_name"/Cargo.toml<< EOF
@@ -47,9 +47,8 @@ git = "https://github.com/wasmerio/wasmer"
 branch = "master"
 
 [dependencies.wit-bindgen-wasmer]
-#git = "https://github.com/wasmerio/wit-bindgen"
-#branch = "silwol/wasmer3"
-path = "/home/silwol/Projects/wasmerio/wit-bindgen/crates/wasmer"
+git = "https://github.com/wasmerio/wit-bindgen"
+branch = "silwol/wasmer3"
 EOF
 
 generate() {
@@ -70,6 +69,7 @@ generate() {
                 || return 1
             sed -r -i 's/^\s+$//' "$wasmer2_destination_dir"/bindings.rs
             mv "$wasmer2_destination_dir/bindings.rs" "$wasmer2_destination_dir/imports.rs"
+            cp "$imports_wit" "$wasmer2_destination_dir"/imports.wit
 
             cargo \
                 run \
@@ -81,6 +81,7 @@ generate() {
                 || return 1
             sed -r -i 's/^\s+$//' "$wasmer3_destination_dir"/bindings.rs
             mv "$wasmer3_destination_dir/bindings.rs" "$wasmer3_destination_dir/imports.rs"
+            cp "$imports_wit" "$wasmer3_destination_dir"/imports.wit
         fi
 
         if [ -e "$exports_wit" ]; then
@@ -92,6 +93,7 @@ generate() {
                 || return 1
             sed -r -i 's/^\s+$//' "$wasmer2_destination_dir"/bindings.rs
             mv "$wasmer2_destination_dir/bindings.rs" "$wasmer2_destination_dir/exports.rs"
+            cp "$exports_wit" "$wasmer2_destination_dir"/exports.wit
 
             cargo \
                 run \
@@ -103,6 +105,7 @@ generate() {
                 || return 1
             sed -r -i 's/^\s+$//' "$wasmer3_destination_dir"/bindings.rs
             mv "$wasmer3_destination_dir/bindings.rs" "$wasmer3_destination_dir/exports.rs"
+            cp "$exports_wit" "$wasmer3_destination_dir"/exports.wit
         fi
 }
 
