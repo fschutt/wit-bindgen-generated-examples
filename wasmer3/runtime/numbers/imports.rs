@@ -34,10 +34,10 @@ pub mod exports {
         /// This function returns the `ExportsData` which needs to be
         /// passed through to `Exports::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<ExportsData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, ExportsData::default());
             env
         }
 
@@ -52,12 +52,12 @@ pub mod exports {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
 
             Ok((Self::new(store, &instance, env)?, instance))
         }
@@ -70,48 +70,48 @@ pub mod exports {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<ExportsData>,
         ) -> Result<Self, wasmer::ExportError> {
-            let func_get_scalar = _instance.exports.get_typed_function(store, "get-scalar")?;
+            let func_get_scalar = _instance.exports.get_typed_function(&store, "get-scalar")?;
             let func_roundtrip_char = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-char")?;
+                .get_typed_function(&store, "roundtrip-char")?;
             let func_roundtrip_float32 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-float32")?;
+                .get_typed_function(&store, "roundtrip-float32")?;
             let func_roundtrip_float64 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-float64")?;
+                .get_typed_function(&store, "roundtrip-float64")?;
             let func_roundtrip_s16 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-s16")?;
+                .get_typed_function(&store, "roundtrip-s16")?;
             let func_roundtrip_s32 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-s32")?;
+                .get_typed_function(&store, "roundtrip-s32")?;
             let func_roundtrip_s64 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-s64")?;
+                .get_typed_function(&store, "roundtrip-s64")?;
             let func_roundtrip_s8 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-s8")?;
+                .get_typed_function(&store, "roundtrip-s8")?;
             let func_roundtrip_u16 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-u16")?;
+                .get_typed_function(&store, "roundtrip-u16")?;
             let func_roundtrip_u32 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-u32")?;
+                .get_typed_function(&store, "roundtrip-u32")?;
             let func_roundtrip_u64 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-u64")?;
+                .get_typed_function(&store, "roundtrip-u64")?;
             let func_roundtrip_u8 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-u8")?;
-            let func_set_scalar = _instance.exports.get_typed_function(store, "set-scalar")?;
+                .get_typed_function(&store, "roundtrip-u8")?;
+            let func_set_scalar = _instance.exports.get_typed_function(&store, "set-scalar")?;
             let func_test_imports = _instance
                 .exports
-                .get_typed_function(store, "test-imports")?;
+                .get_typed_function(&store, "test-imports")?;
             Ok(Exports {
                 func_get_scalar,
                 func_roundtrip_char,

@@ -73,10 +73,10 @@ pub mod many_arguments {
         /// This function returns the `ManyArgumentsData` which needs to be
         /// passed through to `ManyArguments::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<ManyArgumentsData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, ManyArgumentsData::default());
             env
         }
 
@@ -91,12 +91,12 @@ pub mod many_arguments {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
 
             Ok((Self::new(store, &instance, env)?, instance))
         }
@@ -109,17 +109,17 @@ pub mod many_arguments {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<ManyArgumentsData>,
         ) -> Result<Self, wasmer::ExportError> {
             let func_big_argument = _instance
                 .exports
-                .get_typed_function(store, "big-argument")?;
+                .get_typed_function(&store, "big-argument")?;
             let func_canonical_abi_realloc = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_realloc")?;
-            let func_many_args = _instance.exports.get_typed_function(store, "many-args")?;
+                .get_typed_function(&store, "canonical_abi_realloc")?;
+            let func_many_args = _instance.exports.get_typed_function(&store, "many-args")?;
             let memory = _instance.exports.get_memory("memory")?.clone();
             Ok(ManyArguments {
                 func_big_argument,

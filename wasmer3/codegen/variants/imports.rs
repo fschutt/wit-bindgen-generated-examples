@@ -322,10 +322,10 @@ pub mod variants {
         /// This function returns the `VariantsData` which needs to be
         /// passed through to `Variants::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<VariantsData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, VariantsData::default());
             env
         }
 
@@ -340,12 +340,12 @@ pub mod variants {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
 
             Ok((Self::new(store, &instance, env)?, instance))
         }
@@ -358,62 +358,64 @@ pub mod variants {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<VariantsData>,
         ) -> Result<Self, wasmer::ExportError> {
-            let func_bool_arg = _instance.exports.get_typed_function(store, "bool-arg")?;
-            let func_bool_result = _instance.exports.get_typed_function(store, "bool-result")?;
+            let func_bool_arg = _instance.exports.get_typed_function(&store, "bool-arg")?;
+            let func_bool_result = _instance
+                .exports
+                .get_typed_function(&store, "bool-result")?;
             let func_canonical_abi_free = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_free")?;
+                .get_typed_function(&store, "canonical_abi_free")?;
             let func_canonical_abi_realloc = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_realloc")?;
-            let func_casts = _instance.exports.get_typed_function(store, "casts")?;
-            let func_e1_arg = _instance.exports.get_typed_function(store, "e1-arg")?;
-            let func_e1_result = _instance.exports.get_typed_function(store, "e1-result")?;
+                .get_typed_function(&store, "canonical_abi_realloc")?;
+            let func_casts = _instance.exports.get_typed_function(&store, "casts")?;
+            let func_e1_arg = _instance.exports.get_typed_function(&store, "e1-arg")?;
+            let func_e1_result = _instance.exports.get_typed_function(&store, "e1-result")?;
             let func_expected_arg = _instance
                 .exports
-                .get_typed_function(store, "expected-arg")?;
+                .get_typed_function(&store, "expected-arg")?;
             let func_expected_result = _instance
                 .exports
-                .get_typed_function(store, "expected-result")?;
+                .get_typed_function(&store, "expected-result")?;
             let func_expected_simple = _instance
                 .exports
-                .get_typed_function(store, "expected-simple")?;
+                .get_typed_function(&store, "expected-simple")?;
             let func_is_clone_arg = _instance
                 .exports
-                .get_typed_function(store, "is-clone-arg")?;
+                .get_typed_function(&store, "is-clone-arg")?;
             let func_is_clone_return = _instance
                 .exports
-                .get_typed_function(store, "is-clone-return")?;
-            let func_option_arg = _instance.exports.get_typed_function(store, "option-arg")?;
+                .get_typed_function(&store, "is-clone-return")?;
+            let func_option_arg = _instance.exports.get_typed_function(&store, "option-arg")?;
             let func_option_result = _instance
                 .exports
-                .get_typed_function(store, "option-result")?;
+                .get_typed_function(&store, "option-result")?;
             let func_return_expected_sugar = _instance
                 .exports
-                .get_typed_function(store, "return-expected-sugar")?;
+                .get_typed_function(&store, "return-expected-sugar")?;
             let func_return_expected_sugar2 = _instance
                 .exports
-                .get_typed_function(store, "return-expected-sugar2")?;
+                .get_typed_function(&store, "return-expected-sugar2")?;
             let func_return_expected_sugar3 = _instance
                 .exports
-                .get_typed_function(store, "return-expected-sugar3")?;
+                .get_typed_function(&store, "return-expected-sugar3")?;
             let func_return_expected_sugar4 = _instance
                 .exports
-                .get_typed_function(store, "return-expected-sugar4")?;
+                .get_typed_function(&store, "return-expected-sugar4")?;
             let func_return_option_sugar = _instance
                 .exports
-                .get_typed_function(store, "return-option-sugar")?;
+                .get_typed_function(&store, "return-option-sugar")?;
             let func_return_option_sugar2 = _instance
                 .exports
-                .get_typed_function(store, "return-option-sugar2")?;
-            let func_u1_arg = _instance.exports.get_typed_function(store, "u1-arg")?;
-            let func_u1_result = _instance.exports.get_typed_function(store, "u1-result")?;
-            let func_v1_arg = _instance.exports.get_typed_function(store, "v1-arg")?;
-            let func_v1_result = _instance.exports.get_typed_function(store, "v1-result")?;
+                .get_typed_function(&store, "return-option-sugar2")?;
+            let func_u1_arg = _instance.exports.get_typed_function(&store, "u1-arg")?;
+            let func_u1_result = _instance.exports.get_typed_function(&store, "u1-result")?;
+            let func_v1_arg = _instance.exports.get_typed_function(&store, "v1-arg")?;
+            let func_v1_result = _instance.exports.get_typed_function(&store, "v1-result")?;
             let memory = _instance.exports.get_memory("memory")?.clone();
             Ok(Variants {
                 func_bool_arg,

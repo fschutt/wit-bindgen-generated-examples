@@ -207,10 +207,10 @@ pub mod lists {
         /// This function returns the `ListsData` which needs to be
         /// passed through to `Lists::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<ListsData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, ListsData::default());
             env
         }
 
@@ -225,12 +225,12 @@ pub mod lists {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
 
             Ok((Self::new(store, &instance, env)?, instance))
         }
@@ -243,93 +243,101 @@ pub mod lists {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<ListsData>,
         ) -> Result<Self, wasmer::ExportError> {
             let func_canonical_abi_free = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_free")?;
+                .get_typed_function(&store, "canonical_abi_free")?;
             let func_canonical_abi_realloc = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_realloc")?;
+                .get_typed_function(&store, "canonical_abi_realloc")?;
             let func_list_float32_param = _instance
                 .exports
-                .get_typed_function(store, "list-float32-param")?;
+                .get_typed_function(&store, "list-float32-param")?;
             let func_list_float32_ret = _instance
                 .exports
-                .get_typed_function(store, "list-float32-ret")?;
+                .get_typed_function(&store, "list-float32-ret")?;
             let func_list_float64_param = _instance
                 .exports
-                .get_typed_function(store, "list-float64-param")?;
+                .get_typed_function(&store, "list-float64-param")?;
             let func_list_float64_ret = _instance
                 .exports
-                .get_typed_function(store, "list-float64-ret")?;
+                .get_typed_function(&store, "list-float64-ret")?;
             let func_list_s16_param = _instance
                 .exports
-                .get_typed_function(store, "list-s16-param")?;
+                .get_typed_function(&store, "list-s16-param")?;
             let func_list_s16_ret = _instance
                 .exports
-                .get_typed_function(store, "list-s16-ret")?;
+                .get_typed_function(&store, "list-s16-ret")?;
             let func_list_s32_param = _instance
                 .exports
-                .get_typed_function(store, "list-s32-param")?;
+                .get_typed_function(&store, "list-s32-param")?;
             let func_list_s32_ret = _instance
                 .exports
-                .get_typed_function(store, "list-s32-ret")?;
+                .get_typed_function(&store, "list-s32-ret")?;
             let func_list_s64_param = _instance
                 .exports
-                .get_typed_function(store, "list-s64-param")?;
+                .get_typed_function(&store, "list-s64-param")?;
             let func_list_s64_ret = _instance
                 .exports
-                .get_typed_function(store, "list-s64-ret")?;
+                .get_typed_function(&store, "list-s64-ret")?;
             let func_list_s8_param = _instance
                 .exports
-                .get_typed_function(store, "list-s8-param")?;
-            let func_list_s8_ret = _instance.exports.get_typed_function(store, "list-s8-ret")?;
+                .get_typed_function(&store, "list-s8-param")?;
+            let func_list_s8_ret = _instance
+                .exports
+                .get_typed_function(&store, "list-s8-ret")?;
             let func_list_u16_param = _instance
                 .exports
-                .get_typed_function(store, "list-u16-param")?;
+                .get_typed_function(&store, "list-u16-param")?;
             let func_list_u16_ret = _instance
                 .exports
-                .get_typed_function(store, "list-u16-ret")?;
+                .get_typed_function(&store, "list-u16-ret")?;
             let func_list_u32_param = _instance
                 .exports
-                .get_typed_function(store, "list-u32-param")?;
+                .get_typed_function(&store, "list-u32-param")?;
             let func_list_u32_ret = _instance
                 .exports
-                .get_typed_function(store, "list-u32-ret")?;
+                .get_typed_function(&store, "list-u32-ret")?;
             let func_list_u64_param = _instance
                 .exports
-                .get_typed_function(store, "list-u64-param")?;
+                .get_typed_function(&store, "list-u64-param")?;
             let func_list_u64_ret = _instance
                 .exports
-                .get_typed_function(store, "list-u64-ret")?;
+                .get_typed_function(&store, "list-u64-ret")?;
             let func_list_u8_param = _instance
                 .exports
-                .get_typed_function(store, "list-u8-param")?;
-            let func_list_u8_ret = _instance.exports.get_typed_function(store, "list-u8-ret")?;
+                .get_typed_function(&store, "list-u8-param")?;
+            let func_list_u8_ret = _instance
+                .exports
+                .get_typed_function(&store, "list-u8-ret")?;
             let func_load_store_everything = _instance
                 .exports
-                .get_typed_function(store, "load-store-everything")?;
-            let func_record_list = _instance.exports.get_typed_function(store, "record-list")?;
+                .get_typed_function(&store, "load-store-everything")?;
+            let func_record_list = _instance
+                .exports
+                .get_typed_function(&store, "record-list")?;
             let func_record_list_reverse = _instance
                 .exports
-                .get_typed_function(store, "record-list-reverse")?;
-            let func_string_list = _instance.exports.get_typed_function(store, "string-list")?;
+                .get_typed_function(&store, "record-list-reverse")?;
+            let func_string_list = _instance
+                .exports
+                .get_typed_function(&store, "string-list")?;
             let func_string_list_arg = _instance
                 .exports
-                .get_typed_function(store, "string-list-arg")?;
+                .get_typed_function(&store, "string-list-arg")?;
             let func_string_list_ret = _instance
                 .exports
-                .get_typed_function(store, "string-list-ret")?;
-            let func_tuple_list = _instance.exports.get_typed_function(store, "tuple-list")?;
+                .get_typed_function(&store, "string-list-ret")?;
+            let func_tuple_list = _instance.exports.get_typed_function(&store, "tuple-list")?;
             let func_tuple_string_list = _instance
                 .exports
-                .get_typed_function(store, "tuple-string-list")?;
+                .get_typed_function(&store, "tuple-string-list")?;
             let func_variant_list = _instance
                 .exports
-                .get_typed_function(store, "variant-list")?;
+                .get_typed_function(&store, "variant-list")?;
             let memory = _instance.exports.get_memory("memory")?.clone();
             Ok(Lists {
                 func_canonical_abi_free,
@@ -1464,8 +1472,8 @@ pub mod lists {
             store: &mut wasmer::Store,
             x: &[SomeVariant<'_>],
         ) -> Result<Vec<OtherVariantResult>, wasmer::RuntimeError> {
-            let func_canonical_abi_realloc = &self.func_canonical_abi_realloc;
             let func_canonical_abi_free = &self.func_canonical_abi_free;
+            let func_canonical_abi_realloc = &self.func_canonical_abi_realloc;
             let _memory = &self.memory;
             let vec3 = x;
             let len3 = vec3.len() as i32;
@@ -1659,8 +1667,8 @@ pub mod lists {
             store: &mut wasmer::Store,
             a: LoadStoreAllSizesParam<'_>,
         ) -> Result<LoadStoreAllSizesResult, wasmer::RuntimeError> {
-            let func_canonical_abi_free = &self.func_canonical_abi_free;
             let func_canonical_abi_realloc = &self.func_canonical_abi_realloc;
+            let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let vec2 = a;
             let len2 = vec2.len() as i32;

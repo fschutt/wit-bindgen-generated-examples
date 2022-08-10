@@ -22,10 +22,10 @@ pub mod char {
         /// This function returns the `CharData` which needs to be
         /// passed through to `Char::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<CharData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, CharData::default());
             env
         }
 
@@ -40,12 +40,12 @@ pub mod char {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
 
             Ok((Self::new(store, &instance, env)?, instance))
         }
@@ -58,12 +58,14 @@ pub mod char {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<CharData>,
         ) -> Result<Self, wasmer::ExportError> {
-            let func_return_char = _instance.exports.get_typed_function(store, "return-char")?;
-            let func_take_char = _instance.exports.get_typed_function(store, "take-char")?;
+            let func_return_char = _instance
+                .exports
+                .get_typed_function(&store, "return-char")?;
+            let func_take_char = _instance.exports.get_typed_function(&store, "take-char")?;
             Ok(Char {
                 func_return_char,
                 func_take_char,

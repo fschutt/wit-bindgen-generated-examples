@@ -142,10 +142,10 @@ pub mod unions {
         /// This function returns the `UnionsData` which needs to be
         /// passed through to `Unions::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<UnionsData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, UnionsData::default());
             env
         }
 
@@ -160,12 +160,12 @@ pub mod unions {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
 
             Ok((Self::new(store, &instance, env)?, instance))
         }
@@ -178,46 +178,46 @@ pub mod unions {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<UnionsData>,
         ) -> Result<Self, wasmer::ExportError> {
             let func_add_one_distinguishable_num = _instance
                 .exports
-                .get_typed_function(store, "add-one-distinguishable-num")?;
+                .get_typed_function(&store, "add-one-distinguishable-num")?;
             let func_add_one_duplicated = _instance
                 .exports
-                .get_typed_function(store, "add-one-duplicated")?;
+                .get_typed_function(&store, "add-one-duplicated")?;
             let func_add_one_float = _instance
                 .exports
-                .get_typed_function(store, "add-one-float")?;
+                .get_typed_function(&store, "add-one-float")?;
             let func_add_one_integer = _instance
                 .exports
-                .get_typed_function(store, "add-one-integer")?;
+                .get_typed_function(&store, "add-one-integer")?;
             let func_canonical_abi_free = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_free")?;
+                .get_typed_function(&store, "canonical_abi_free")?;
             let func_canonical_abi_realloc = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_realloc")?;
+                .get_typed_function(&store, "canonical_abi_realloc")?;
             let func_identify_distinguishable_num = _instance
                 .exports
-                .get_typed_function(store, "identify-distinguishable-num")?;
+                .get_typed_function(&store, "identify-distinguishable-num")?;
             let func_identify_duplicated = _instance
                 .exports
-                .get_typed_function(store, "identify-duplicated")?;
+                .get_typed_function(&store, "identify-duplicated")?;
             let func_identify_float = _instance
                 .exports
-                .get_typed_function(store, "identify-float")?;
+                .get_typed_function(&store, "identify-float")?;
             let func_identify_integer = _instance
                 .exports
-                .get_typed_function(store, "identify-integer")?;
+                .get_typed_function(&store, "identify-integer")?;
             let func_identify_text = _instance
                 .exports
-                .get_typed_function(store, "identify-text")?;
+                .get_typed_function(&store, "identify-text")?;
             let func_replace_first_char = _instance
                 .exports
-                .get_typed_function(store, "replace-first-char")?;
+                .get_typed_function(&store, "replace-first-char")?;
             let memory = _instance.exports.get_memory("memory")?.clone();
             Ok(Unions {
                 func_add_one_distinguishable_num,
@@ -350,8 +350,8 @@ pub mod unions {
             text: AllTextParam<'_>,
             letter: char,
         ) -> Result<AllTextResult, wasmer::RuntimeError> {
-            let func_canonical_abi_realloc = &self.func_canonical_abi_realloc;
             let func_canonical_abi_free = &self.func_canonical_abi_free;
+            let func_canonical_abi_realloc = &self.func_canonical_abi_realloc;
             let _memory = &self.memory;
             let (result1_0, result1_1, result1_2) = match text {
                 AllTextParam::Char(e) => (0i32, wit_bindgen_wasmer::rt::as_i32(e), 0i32),

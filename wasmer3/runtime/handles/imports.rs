@@ -122,10 +122,10 @@ pub mod exports {
         /// This function returns the `ExportsData` which needs to be
         /// passed through to `Exports::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<ExportsData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, ExportsData::default());
             let mut canonical_abi = imports
                 .get_namespace_exports("canonical_abi")
                 .unwrap_or_else(wasmer::Exports::new);
@@ -133,7 +133,7 @@ pub mod exports {
             canonical_abi.insert(
                 "resource_drop_wasm-state",
                 wasmer::Function::new_native(
-                    store,
+                    &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
                           idx: u32|
@@ -152,7 +152,7 @@ pub mod exports {
             canonical_abi.insert(
                 "resource_clone_wasm-state",
                 wasmer::Function::new_native(
-                    store,
+                    &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
                           idx: u32|
@@ -167,7 +167,7 @@ pub mod exports {
             canonical_abi.insert(
                 "resource_get_wasm-state",
                 wasmer::Function::new_native(
-                    store,
+                    &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
                           idx: u32|
@@ -181,7 +181,7 @@ pub mod exports {
             canonical_abi.insert(
                 "resource_new_wasm-state",
                 wasmer::Function::new_native(
-                    store,
+                    &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
                           val: i32|
@@ -196,7 +196,7 @@ pub mod exports {
             canonical_abi.insert(
                 "resource_drop_wasm-state2",
                 wasmer::Function::new_native(
-                    store,
+                    &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
                           idx: u32|
@@ -215,7 +215,7 @@ pub mod exports {
             canonical_abi.insert(
                 "resource_clone_wasm-state2",
                 wasmer::Function::new_native(
-                    store,
+                    &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
                           idx: u32|
@@ -230,7 +230,7 @@ pub mod exports {
             canonical_abi.insert(
                 "resource_get_wasm-state2",
                 wasmer::Function::new_native(
-                    store,
+                    &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
                           idx: u32|
@@ -244,7 +244,7 @@ pub mod exports {
             canonical_abi.insert(
                 "resource_new_wasm-state2",
                 wasmer::Function::new_native(
-                    store,
+                    &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
                           val: i32|
@@ -259,7 +259,7 @@ pub mod exports {
             canonical_abi.insert(
                 "resource_drop_markdown",
                 wasmer::Function::new_native(
-                    store,
+                    &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
                           idx: u32|
@@ -278,7 +278,7 @@ pub mod exports {
             canonical_abi.insert(
                 "resource_clone_markdown",
                 wasmer::Function::new_native(
-                    store,
+                    &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
                           idx: u32|
@@ -293,7 +293,7 @@ pub mod exports {
             canonical_abi.insert(
                 "resource_get_markdown",
                 wasmer::Function::new_native(
-                    store,
+                    &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
                           idx: u32|
@@ -307,7 +307,7 @@ pub mod exports {
             canonical_abi.insert(
                 "resource_new_markdown",
                 wasmer::Function::new_native(
-                    store,
+                    &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
                           val: i32|
@@ -333,35 +333,35 @@ pub mod exports {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
             {
                 let dtor0 = instance
                     .exports
-                    .get_typed_function(store, "canonical_abi_drop_wasm-state")?
+                    .get_typed_function(&store, "canonical_abi_drop_wasm-state")?
                     .clone();
                 let dtor1 = instance
                     .exports
-                    .get_typed_function(store, "canonical_abi_drop_wasm-state2")?
+                    .get_typed_function(&store, "canonical_abi_drop_wasm-state2")?
                     .clone();
                 let dtor2 = instance
                     .exports
-                    .get_typed_function(store, "canonical_abi_drop_markdown")?
+                    .get_typed_function(&store, "canonical_abi_drop_markdown")?
                     .clone();
 
-                env.as_mut(store)
+                env.as_mut(&mut store)
                     .dtor0
                     .set(dtor0)
                     .map_err(|_e| anyhow::anyhow!("Couldn't set canonical_abi_drop_wasm-state"))?;
-                env.as_mut(store)
+                env.as_mut(&mut store)
                     .dtor1
                     .set(dtor1)
                     .map_err(|_e| anyhow::anyhow!("Couldn't set canonical_abi_drop_wasm-state2"))?;
-                env.as_mut(store)
+                env.as_mut(&mut store)
                     .dtor2
                     .set(dtor2)
                     .map_err(|_e| anyhow::anyhow!("Couldn't set canonical_abi_drop_markdown"))?;
@@ -378,79 +378,79 @@ pub mod exports {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<ExportsData>,
         ) -> Result<Self, wasmer::ExportError> {
             let func_canonical_abi_free = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_free")?;
+                .get_typed_function(&store, "canonical_abi_free")?;
             let func_canonical_abi_realloc = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_realloc")?;
+                .get_typed_function(&store, "canonical_abi_realloc")?;
             let func_markdown_append = _instance
                 .exports
-                .get_typed_function(store, "markdown::append")?;
+                .get_typed_function(&store, "markdown::append")?;
             let func_markdown_create = _instance
                 .exports
-                .get_typed_function(store, "markdown::create")?;
+                .get_typed_function(&store, "markdown::create")?;
             let func_markdown_render = _instance
                 .exports
-                .get_typed_function(store, "markdown::render")?;
+                .get_typed_function(&store, "markdown::render")?;
             let func_test_imports = _instance
                 .exports
-                .get_typed_function(store, "test-imports")?;
+                .get_typed_function(&store, "test-imports")?;
             let func_two_wasm_states = _instance
                 .exports
-                .get_typed_function(store, "two-wasm-states")?;
+                .get_typed_function(&store, "two-wasm-states")?;
             let func_wasm_state2_create = _instance
                 .exports
-                .get_typed_function(store, "wasm-state2-create")?;
+                .get_typed_function(&store, "wasm-state2-create")?;
             let func_wasm_state2_param_list = _instance
                 .exports
-                .get_typed_function(store, "wasm-state2-param-list")?;
+                .get_typed_function(&store, "wasm-state2-param-list")?;
             let func_wasm_state2_param_option = _instance
                 .exports
-                .get_typed_function(store, "wasm-state2-param-option")?;
+                .get_typed_function(&store, "wasm-state2-param-option")?;
             let func_wasm_state2_param_record = _instance
                 .exports
-                .get_typed_function(store, "wasm-state2-param-record")?;
+                .get_typed_function(&store, "wasm-state2-param-record")?;
             let func_wasm_state2_param_result = _instance
                 .exports
-                .get_typed_function(store, "wasm-state2-param-result")?;
+                .get_typed_function(&store, "wasm-state2-param-result")?;
             let func_wasm_state2_param_tuple = _instance
                 .exports
-                .get_typed_function(store, "wasm-state2-param-tuple")?;
+                .get_typed_function(&store, "wasm-state2-param-tuple")?;
             let func_wasm_state2_param_variant = _instance
                 .exports
-                .get_typed_function(store, "wasm-state2-param-variant")?;
+                .get_typed_function(&store, "wasm-state2-param-variant")?;
             let func_wasm_state2_result_list = _instance
                 .exports
-                .get_typed_function(store, "wasm-state2-result-list")?;
+                .get_typed_function(&store, "wasm-state2-result-list")?;
             let func_wasm_state2_result_option = _instance
                 .exports
-                .get_typed_function(store, "wasm-state2-result-option")?;
+                .get_typed_function(&store, "wasm-state2-result-option")?;
             let func_wasm_state2_result_record = _instance
                 .exports
-                .get_typed_function(store, "wasm-state2-result-record")?;
+                .get_typed_function(&store, "wasm-state2-result-record")?;
             let func_wasm_state2_result_result = _instance
                 .exports
-                .get_typed_function(store, "wasm-state2-result-result")?;
+                .get_typed_function(&store, "wasm-state2-result-result")?;
             let func_wasm_state2_result_tuple = _instance
                 .exports
-                .get_typed_function(store, "wasm-state2-result-tuple")?;
+                .get_typed_function(&store, "wasm-state2-result-tuple")?;
             let func_wasm_state2_result_variant = _instance
                 .exports
-                .get_typed_function(store, "wasm-state2-result-variant")?;
+                .get_typed_function(&store, "wasm-state2-result-variant")?;
             let func_wasm_state2_saw_close = _instance
                 .exports
-                .get_typed_function(store, "wasm-state2-saw-close")?;
+                .get_typed_function(&store, "wasm-state2-saw-close")?;
             let func_wasm_state_create = _instance
                 .exports
-                .get_typed_function(store, "wasm-state-create")?;
+                .get_typed_function(&store, "wasm-state-create")?;
             let func_wasm_state_get_val = _instance
                 .exports
-                .get_typed_function(store, "wasm-state-get-val")?;
+                .get_typed_function(&store, "wasm-state-get-val")?;
             let memory = _instance.exports.get_memory("memory")?.clone();
             Ok(Exports {
                 func_canonical_abi_free,

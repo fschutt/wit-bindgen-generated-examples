@@ -34,10 +34,10 @@ pub mod exports {
         /// This function returns the `ExportsData` which needs to be
         /// passed through to `Exports::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<ExportsData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, ExportsData::default());
             env
         }
 
@@ -52,12 +52,12 @@ pub mod exports {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
 
             Ok((Self::new(store, &instance, env)?, instance))
         }
@@ -70,39 +70,47 @@ pub mod exports {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<ExportsData>,
         ) -> Result<Self, wasmer::ExportError> {
             let func_allocated_bytes = _instance
                 .exports
-                .get_typed_function(store, "allocated-bytes")?;
+                .get_typed_function(&store, "allocated-bytes")?;
             let func_canonical_abi_free = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_free")?;
+                .get_typed_function(&store, "canonical_abi_free")?;
             let func_canonical_abi_realloc = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_realloc")?;
-            let func_list_param = _instance.exports.get_typed_function(store, "list-param")?;
-            let func_list_param2 = _instance.exports.get_typed_function(store, "list-param2")?;
-            let func_list_param3 = _instance.exports.get_typed_function(store, "list-param3")?;
-            let func_list_param4 = _instance.exports.get_typed_function(store, "list-param4")?;
-            let func_list_result = _instance.exports.get_typed_function(store, "list-result")?;
+                .get_typed_function(&store, "canonical_abi_realloc")?;
+            let func_list_param = _instance.exports.get_typed_function(&store, "list-param")?;
+            let func_list_param2 = _instance
+                .exports
+                .get_typed_function(&store, "list-param2")?;
+            let func_list_param3 = _instance
+                .exports
+                .get_typed_function(&store, "list-param3")?;
+            let func_list_param4 = _instance
+                .exports
+                .get_typed_function(&store, "list-param4")?;
+            let func_list_result = _instance
+                .exports
+                .get_typed_function(&store, "list-result")?;
             let func_list_result2 = _instance
                 .exports
-                .get_typed_function(store, "list-result2")?;
+                .get_typed_function(&store, "list-result2")?;
             let func_list_result3 = _instance
                 .exports
-                .get_typed_function(store, "list-result3")?;
+                .get_typed_function(&store, "list-result3")?;
             let func_list_roundtrip = _instance
                 .exports
-                .get_typed_function(store, "list-roundtrip")?;
+                .get_typed_function(&store, "list-roundtrip")?;
             let func_string_roundtrip = _instance
                 .exports
-                .get_typed_function(store, "string-roundtrip")?;
+                .get_typed_function(&store, "string-roundtrip")?;
             let func_test_imports = _instance
                 .exports
-                .get_typed_function(store, "test-imports")?;
+                .get_typed_function(&store, "test-imports")?;
             let memory = _instance.exports.get_memory("memory")?.clone();
             Ok(Exports {
                 func_allocated_bytes,
@@ -334,8 +342,8 @@ pub mod exports {
             store: &mut wasmer::Store,
             a: &[u8],
         ) -> Result<Vec<u8>, wasmer::RuntimeError> {
-            let func_canonical_abi_free = &self.func_canonical_abi_free;
             let func_canonical_abi_realloc = &self.func_canonical_abi_realloc;
+            let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let vec0 = a;
             let ptr0 = func_canonical_abi_realloc.call(
@@ -369,8 +377,8 @@ pub mod exports {
             store: &mut wasmer::Store,
             a: &str,
         ) -> Result<String, wasmer::RuntimeError> {
-            let func_canonical_abi_free = &self.func_canonical_abi_free;
             let func_canonical_abi_realloc = &self.func_canonical_abi_realloc;
+            let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let vec0 = a;
             let ptr0 = func_canonical_abi_realloc.call(

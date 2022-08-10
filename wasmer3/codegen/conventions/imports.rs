@@ -65,10 +65,10 @@ pub mod conventions {
         /// This function returns the `ConventionsData` which needs to be
         /// passed through to `Conventions::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<ConventionsData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, ConventionsData::default());
             env
         }
 
@@ -83,12 +83,12 @@ pub mod conventions {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
 
             Ok((Self::new(store, &instance, env)?, instance))
         }
@@ -101,36 +101,38 @@ pub mod conventions {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<ConventionsData>,
         ) -> Result<Self, wasmer::ExportError> {
-            let func_a0 = _instance.exports.get_typed_function(store, "a0")?;
-            let func_apple = _instance.exports.get_typed_function(store, "apple")?;
-            let func_apple_pear = _instance.exports.get_typed_function(store, "apple-pear")?;
+            let func_a0 = _instance.exports.get_typed_function(&store, "a0")?;
+            let func_apple = _instance.exports.get_typed_function(&store, "apple")?;
+            let func_apple_pear = _instance.exports.get_typed_function(&store, "apple-pear")?;
             let func_apple_pear_grape = _instance
                 .exports
-                .get_typed_function(store, "apple-pear-grape")?;
-            let func_bool = _instance.exports.get_typed_function(store, "bool")?;
-            let func_explicit = _instance.exports.get_typed_function(store, "explicit")?;
+                .get_typed_function(&store, "apple-pear-grape")?;
+            let func_bool = _instance.exports.get_typed_function(&store, "bool")?;
+            let func_explicit = _instance.exports.get_typed_function(&store, "explicit")?;
             let func_explicit_kebab = _instance
                 .exports
-                .get_typed_function(store, "explicit-kebab")?;
-            let func_foo = _instance.exports.get_typed_function(store, "foo")?;
+                .get_typed_function(&store, "explicit-kebab")?;
+            let func_foo = _instance.exports.get_typed_function(&store, "foo")?;
             let func_function_with_dashes = _instance
                 .exports
-                .get_typed_function(store, "function-with-dashes")?;
+                .get_typed_function(&store, "function-with-dashes")?;
             let func_function_with_no_weird_characters = _instance
                 .exports
-                .get_typed_function(store, "function-with-no-weird-characters")?;
-            let func_garçon = _instance.exports.get_typed_function(store, "garçon")?;
+                .get_typed_function(&store, "function-with-no-weird-characters")?;
+            let func_garçon = _instance.exports.get_typed_function(&store, "garçon")?;
             let func_garçon_hühnervögel_москва_東_京 = _instance
                 .exports
-                .get_typed_function(store, "garçon-hühnervögel-москва-東-京")?;
-            let func_hühnervögel = _instance.exports.get_typed_function(store, "hühnervögel")?;
-            let func_kebab_case = _instance.exports.get_typed_function(store, "kebab-case")?;
-            let func_москва = _instance.exports.get_typed_function(store, "москва")?;
-            let func_東_京 = _instance.exports.get_typed_function(store, "東-京")?;
+                .get_typed_function(&store, "garçon-hühnervögel-москва-東-京")?;
+            let func_hühnervögel = _instance
+                .exports
+                .get_typed_function(&store, "hühnervögel")?;
+            let func_kebab_case = _instance.exports.get_typed_function(&store, "kebab-case")?;
+            let func_москва = _instance.exports.get_typed_function(&store, "москва")?;
+            let func_東_京 = _instance.exports.get_typed_function(&store, "東-京")?;
             Ok(Conventions {
                 func_a0,
                 func_apple,
