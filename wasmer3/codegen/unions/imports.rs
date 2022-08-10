@@ -262,12 +262,13 @@ pub mod unions {
             let result1 = self
                 .func_add_one_integer
                 .call(store, result0_0, result0_1)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result1 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result1 + 0)?;
             Ok(match i32::from(load2) {
                 0 => AllIntegers::Bool({
-                    let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<u8>(result1 + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load3 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result1 + 8)?;
                     match i32::from(load3) {
                         0 => false,
                         1 => true,
@@ -275,43 +276,51 @@ pub mod unions {
                     }
                 }),
                 1 => AllIntegers::U8({
-                    let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<u8>(result1 + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load4 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result1 + 8)?;
                     u8::try_from(i32::from(load4)).map_err(bad_int)?
                 }),
                 2 => AllIntegers::U16({
-                    let load5 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<u16>(result1 + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load5 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<u16>(result1 + 8)?;
                     u16::try_from(i32::from(load5)).map_err(bad_int)?
                 }),
                 3 => AllIntegers::U32({
-                    let load6 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(result1 + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load6 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 8)?;
                     load6 as u32
                 }),
                 4 => AllIntegers::U64({
-                    let load7 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i64>(result1 + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load7 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i64>(result1 + 8)?;
                     load7 as u64
                 }),
                 5 => AllIntegers::I8({
-                    let load8 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i8>(result1 + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load8 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i8>(result1 + 8)?;
                     i8::try_from(i32::from(load8)).map_err(bad_int)?
                 }),
                 6 => AllIntegers::I16({
-                    let load9 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i16>(result1 + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load9 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i16>(result1 + 8)?;
                     i16::try_from(i32::from(load9)).map_err(bad_int)?
                 }),
                 7 => AllIntegers::I32({
-                    let load10 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(result1 + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load10 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 8)?;
                     load10
                 }),
                 8 => AllIntegers::I64({
-                    let load11 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i64>(result1 + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load11 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i64>(result1 + 8)?;
                     load11
                 }),
                 _ => return Err(invalid_variant("AllIntegers")),
@@ -328,17 +337,19 @@ pub mod unions {
                 AllFloats::F64(e) => (1i32, (e).to_bits() as i64),
             };
             let result1 = self.func_add_one_float.call(store, result0_0, result0_1)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result1 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result1 + 0)?;
             Ok(match i32::from(load2) {
                 0 => AllFloats::F32({
-                    let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<f32>(result1 + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load3 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<f32>(result1 + 8)?;
                     load3
                 }),
                 1 => AllFloats::F64({
-                    let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<f64>(result1 + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load4 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<f64>(result1 + 8)?;
                     load4
                 }),
                 _ => return Err(invalid_variant("AllFloats")),
@@ -364,7 +375,8 @@ pub mod unions {
                         1,
                         vec0.len() as i32,
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store_many(ptr0, vec0.as_bytes())?;
                     (1i32, ptr0, vec0.len() as i32)
                 }
@@ -376,19 +388,22 @@ pub mod unions {
                 result1_2,
                 wit_bindgen_wasmer::rt::as_i32(letter),
             )?;
-            let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result2 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load3 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result2 + 0)?;
             Ok(match i32::from(load3) {
                 0 => AllTextResult::Char({
-                    let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(result2 + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load4 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result2 + 4)?;
                     char_from_i32(load4)?
                 }),
                 1 => AllTextResult::String({
-                    let load5 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(result2 + 4)?;
-                    let load6 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(result2 + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load5 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result2 + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load6 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result2 + 8)?;
                     let ptr7 = load5;
                     let len7 = load6;
 
@@ -456,7 +471,8 @@ pub mod unions {
                         1,
                         vec0.len() as i32,
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store_many(ptr0, vec0.as_bytes())?;
                     (1i32, ptr0, vec0.len() as i32)
                 }
@@ -480,22 +496,25 @@ pub mod unions {
             let result1 = self
                 .func_add_one_duplicated
                 .call(store, result0_0, result0_1)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result1 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result1 + 0)?;
             Ok(match i32::from(load2) {
                 0 => DuplicatedS32::I320({
-                    let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(result1 + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load3 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 4)?;
                     load3
                 }),
                 1 => DuplicatedS32::I321({
-                    let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(result1 + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load4 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 4)?;
                     load4
                 }),
                 2 => DuplicatedS32::I322({
-                    let load5 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(result1 + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load5 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 4)?;
                     load5
                 }),
                 _ => return Err(invalid_variant("DuplicatedS32")),
@@ -529,17 +548,19 @@ pub mod unions {
             let result1 = self
                 .func_add_one_distinguishable_num
                 .call(store, result0_0, result0_1)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result1 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result1 + 0)?;
             Ok(match i32::from(load2) {
                 0 => DistinguishableNum::F64({
-                    let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<f64>(result1 + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load3 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<f64>(result1 + 8)?;
                     load3
                 }),
                 1 => DistinguishableNum::I64({
-                    let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i64>(result1 + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load4 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i64>(result1 + 8)?;
                     load4
                 }),
                 _ => return Err(invalid_variant("DistinguishableNum")),

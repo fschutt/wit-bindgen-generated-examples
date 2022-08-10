@@ -345,10 +345,10 @@ pub mod exports {
         ) -> Result<(u8, u16), wasmer::RuntimeError> {
             let _memory = &self.memory;
             let result0 = self.func_multiple_results.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u16>(result0 + 2)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<u16>(result0 + 2)?;
             Ok((
                 u8::try_from(i32::from(load1)).map_err(bad_int)?,
                 u16::try_from(i32::from(load2)).map_err(bad_int)?,
@@ -366,10 +366,10 @@ pub mod exports {
                 wit_bindgen_wasmer::rt::as_i32(t0_0),
                 wit_bindgen_wasmer::rt::as_i32(t0_1),
             )?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result1 + 0)?;
-            let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result1 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load3 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result1 + 4)?;
             Ok((
                 load2 as u32,
                 u8::try_from(i32::from(load3)).map_err(bad_int)?,
@@ -428,16 +428,16 @@ pub mod exports {
                 (flags3.bits >> 0) as i32,
                 (flags3.bits >> 32) as i32,
             )?;
-            let load5 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result4 + 0)?;
-            let load6 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u16>(result4 + 2)?;
-            let load7 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result4 + 4)?;
-            let load8 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result4 + 8)?;
-            let load9 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result4 + 12)?;
+            let _memory_view = _memory.view(&store);
+            let load5 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result4 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load6 = unsafe { _memory_view.data_unchecked_mut() }.load::<u16>(result4 + 2)?;
+            let _memory_view = _memory.view(&store);
+            let load7 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result4 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load8 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result4 + 8)?;
+            let _memory_view = _memory.view(&store);
+            let load9 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result4 + 12)?;
             Ok((
                 validate_flags(
                     0 | ((i32::from(load5) as u8) << 0),
@@ -478,10 +478,10 @@ pub mod exports {
                 wit_bindgen_wasmer::rt::as_i32(a0),
                 (flags1.bits >> 0) as i32,
             )?;
-            let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result2 + 0)?;
-            let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result2 + 1)?;
+            let _memory_view = _memory.view(&store);
+            let load3 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result2 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load4 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result2 + 1)?;
             Ok(R1 {
                 a: u8::try_from(i32::from(load3)).map_err(bad_int)?,
                 b: validate_flags(

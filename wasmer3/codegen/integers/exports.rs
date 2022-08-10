@@ -80,7 +80,7 @@ pub mod integers {
         let mut store = store.as_store_mut();
         exports.insert(
             "a1",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -97,7 +97,7 @@ pub mod integers {
         );
         exports.insert(
             "a2",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -114,7 +114,7 @@ pub mod integers {
         );
         exports.insert(
             "a3",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -131,7 +131,7 @@ pub mod integers {
         );
         exports.insert(
             "a4",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -148,7 +148,7 @@ pub mod integers {
         );
         exports.insert(
             "a5",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -165,7 +165,7 @@ pub mod integers {
         );
         exports.insert(
             "a6",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -182,7 +182,7 @@ pub mod integers {
         );
         exports.insert(
             "a7",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -199,7 +199,7 @@ pub mod integers {
         );
         exports.insert(
             "a8",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -216,7 +216,7 @@ pub mod integers {
         );
         exports.insert(
             "a9",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -249,7 +249,7 @@ pub mod integers {
         );
         exports.insert(
     "r1",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<i32, wasmer::RuntimeError> {
@@ -261,7 +261,7 @@ pub mod integers {
     ));
         exports.insert(
     "r2",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<i32, wasmer::RuntimeError> {
@@ -273,7 +273,7 @@ pub mod integers {
     ));
         exports.insert(
     "r3",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<i32, wasmer::RuntimeError> {
@@ -285,7 +285,7 @@ pub mod integers {
     ));
         exports.insert(
     "r4",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<i32, wasmer::RuntimeError> {
@@ -297,7 +297,7 @@ pub mod integers {
     ));
         exports.insert(
     "r5",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<i32, wasmer::RuntimeError> {
@@ -309,7 +309,7 @@ pub mod integers {
     ));
         exports.insert(
     "r6",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<i32, wasmer::RuntimeError> {
@@ -321,7 +321,7 @@ pub mod integers {
     ));
         exports.insert(
     "r7",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<i64, wasmer::RuntimeError> {
@@ -333,7 +333,7 @@ pub mod integers {
     ));
         exports.insert(
     "r8",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<i64, wasmer::RuntimeError> {
@@ -345,7 +345,7 @@ pub mod integers {
     ));
         exports.insert(
             "pair-ret",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -356,8 +356,8 @@ pub mod integers {
                     let host = &mut data_mut.data;
                     let result = host.pair_ret();
                     let (t0_0, t0_1) = result;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store(
                         arg0 + 0,
                         wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(t0_0)),

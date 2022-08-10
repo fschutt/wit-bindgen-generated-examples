@@ -441,10 +441,10 @@ pub mod flags {
                 (flags0.bits >> 0) as i32,
                 (flags0.bits >> 32) as i32,
             )?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result1 + 0)?;
-            let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result1 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load3 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 4)?;
             Ok(validate_flags(
                 0 | ((load2 as u64) << 0) | ((load3 as u64) << 32),
                 Flag64::all().bits(),

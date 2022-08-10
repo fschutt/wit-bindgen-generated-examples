@@ -97,8 +97,8 @@ pub mod strings {
                 1,
                 vec0.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr0, vec0.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr0, vec0.as_bytes())?;
             self.func_a.call(store, ptr0, vec0.len() as i32)?;
             Ok(())
         }
@@ -106,10 +106,10 @@ pub mod strings {
             let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let result0 = self.func_b.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
             let ptr3 = load1;
             let len3 = load2;
 
@@ -133,8 +133,8 @@ pub mod strings {
                 1,
                 vec0.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr0, vec0.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr0, vec0.as_bytes())?;
             let vec1 = b;
             let ptr1 = func_canonical_abi_realloc.call(
                 &mut store.as_store_mut(),
@@ -143,15 +143,15 @@ pub mod strings {
                 1,
                 vec1.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr1, vec1.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr1, vec1.as_bytes())?;
             let result2 =
                 self.func_c
                     .call(store, ptr0, vec0.len() as i32, ptr1, vec1.len() as i32)?;
-            let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result2 + 0)?;
-            let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result2 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load3 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result2 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load4 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result2 + 4)?;
             let ptr5 = load3;
             let len5 = load4;
 

@@ -9,11 +9,6 @@ edition = "2018"
 
 [lib]
 path = "lib.rs"
-
-[dependencies.wasmer]
-git = "https://github.com/wasmerio/wasmer"
-branch = "master"
-
 [dependencies.wit-bindgen-wasmer]
 git = "https://github.com/wasmerio/wit-bindgen"
-branch = "silwol/wasmer3"
+branch = "silwol/memory_view"

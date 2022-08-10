@@ -280,7 +280,7 @@ pub mod flags {
         let mut store = store.as_store_mut();
         exports.insert(
             "roundtrip-flag1",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -302,7 +302,7 @@ pub mod flags {
         );
         exports.insert(
             "roundtrip-flag2",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -324,7 +324,7 @@ pub mod flags {
         );
         exports.insert(
             "roundtrip-flag4",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -346,7 +346,7 @@ pub mod flags {
         );
         exports.insert(
             "roundtrip-flag8",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -368,7 +368,7 @@ pub mod flags {
         );
         exports.insert(
             "roundtrip-flag16",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -390,7 +390,7 @@ pub mod flags {
         );
         exports.insert(
             "roundtrip-flag32",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -412,7 +412,7 @@ pub mod flags {
         );
         exports.insert(
             "roundtrip-flag64",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -431,8 +431,8 @@ pub mod flags {
                     let host = &mut data_mut.data;
                     let result = host.roundtrip_flag64(param0);
                     let flags0 = result;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store(
                         arg2 + 4,
                         wit_bindgen_wasmer::rt::as_i32((flags0.bits >> 32) as i32),

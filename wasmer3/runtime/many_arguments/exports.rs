@@ -58,15 +58,16 @@ pub mod imports {
         let mut store = store.as_store_mut();
         exports.insert(
             "many-arguments",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
                       arg0: i32|
                       -> Result<(), wasmer::RuntimeError> {
                     let _memory: wasmer::Memory = store.data().lazy.get().unwrap().memory.clone();
+                    let _memory_view = _memory.view(&store);
                     let mut _bc = wit_bindgen_wasmer::BorrowChecker::new(unsafe {
-                        _memory.data_unchecked_mut(&store)
+                        _memory_view.data_unchecked_mut()
                     });
                     let data_mut = store.data_mut();
                     let load0 = _bc.load::<i64>(arg0 + 0)?;

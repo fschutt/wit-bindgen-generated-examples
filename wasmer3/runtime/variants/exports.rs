@@ -243,7 +243,7 @@ pub mod imports {
         let mut store = store.as_store_mut();
         exports.insert(
             "roundtrip-option",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -262,8 +262,8 @@ pub mod imports {
                     let result = host.roundtrip_option(param0);
                     match result {
                         Some(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg2 + 0, wit_bindgen_wasmer::rt::as_i32(1i32) as u8)?;
                             caller_memory.store(
@@ -275,8 +275,8 @@ pub mod imports {
                         None => {
                             let e = ();
                             {
-                                let caller_memory =
-                                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                                let _memory_view = _memory.view(&store);
+                                let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                                 caller_memory
                                     .store(arg2 + 0, wit_bindgen_wasmer::rt::as_i32(0i32) as u8)?;
                                 let () = e;
@@ -289,7 +289,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-result",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -308,15 +308,15 @@ pub mod imports {
                     let result = host.roundtrip_result(param0);
                     match result {
                         Ok(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg2 + 0, wit_bindgen_wasmer::rt::as_i32(0i32) as u8)?;
                             caller_memory.store(arg2 + 8, wit_bindgen_wasmer::rt::as_f64(e))?;
                         }
                         Err(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg2 + 0, wit_bindgen_wasmer::rt::as_i32(1i32) as u8)?;
                             caller_memory.store(
@@ -332,7 +332,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-enum",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -353,7 +353,7 @@ pub mod imports {
         );
         exports.insert(
             "invert-bool",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -377,7 +377,7 @@ pub mod imports {
         );
         exports.insert(
             "variant-casts",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -434,8 +434,8 @@ pub mod imports {
                     let (t0_0, t0_1, t0_2, t0_3, t0_4, t0_5) = result;
                     match t0_0 {
                         C1::A(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg12 + 0, wit_bindgen_wasmer::rt::as_i32(0i32) as u8)?;
                             caller_memory.store(
@@ -444,8 +444,8 @@ pub mod imports {
                             )?;
                         }
                         C1::B(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg12 + 0, wit_bindgen_wasmer::rt::as_i32(1i32) as u8)?;
                             caller_memory.store(
@@ -456,8 +456,8 @@ pub mod imports {
                     };
                     match t0_1 {
                         C2::A(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg12 + 16, wit_bindgen_wasmer::rt::as_i32(0i32) as u8)?;
                             caller_memory.store(
@@ -466,8 +466,8 @@ pub mod imports {
                             )?;
                         }
                         C2::B(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg12 + 16, wit_bindgen_wasmer::rt::as_i32(1i32) as u8)?;
                             caller_memory.store(arg12 + 20, wit_bindgen_wasmer::rt::as_f32(e))?;
@@ -475,8 +475,8 @@ pub mod imports {
                     };
                     match t0_2 {
                         C3::A(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg12 + 24, wit_bindgen_wasmer::rt::as_i32(0i32) as u8)?;
                             caller_memory.store(
@@ -485,8 +485,8 @@ pub mod imports {
                             )?;
                         }
                         C3::B(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg12 + 24, wit_bindgen_wasmer::rt::as_i32(1i32) as u8)?;
                             caller_memory.store(arg12 + 32, wit_bindgen_wasmer::rt::as_f64(e))?;
@@ -494,8 +494,8 @@ pub mod imports {
                     };
                     match t0_3 {
                         C4::A(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg12 + 40, wit_bindgen_wasmer::rt::as_i32(0i32) as u8)?;
                             caller_memory.store(
@@ -504,8 +504,8 @@ pub mod imports {
                             )?;
                         }
                         C4::B(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg12 + 40, wit_bindgen_wasmer::rt::as_i32(1i32) as u8)?;
                             caller_memory.store(arg12 + 48, wit_bindgen_wasmer::rt::as_f32(e))?;
@@ -513,8 +513,8 @@ pub mod imports {
                     };
                     match t0_4 {
                         C5::A(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg12 + 56, wit_bindgen_wasmer::rt::as_i32(0i32) as u8)?;
                             caller_memory.store(
@@ -523,8 +523,8 @@ pub mod imports {
                             )?;
                         }
                         C5::B(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg12 + 56, wit_bindgen_wasmer::rt::as_i32(1i32) as u8)?;
                             caller_memory.store(arg12 + 64, wit_bindgen_wasmer::rt::as_f64(e))?;
@@ -532,15 +532,15 @@ pub mod imports {
                     };
                     match t0_5 {
                         C6::A(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg12 + 72, wit_bindgen_wasmer::rt::as_i32(0i32) as u8)?;
                             caller_memory.store(arg12 + 80, wit_bindgen_wasmer::rt::as_f32(e))?;
                         }
                         C6::B(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg12 + 72, wit_bindgen_wasmer::rt::as_i32(1i32) as u8)?;
                             caller_memory.store(arg12 + 80, wit_bindgen_wasmer::rt::as_f64(e))?;
@@ -552,7 +552,7 @@ pub mod imports {
         );
         exports.insert(
             "variant-zeros",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -595,8 +595,8 @@ pub mod imports {
                     let (t0_0, t0_1, t0_2, t0_3) = result;
                     match t0_0 {
                         Z1::A(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg8 + 0, wit_bindgen_wasmer::rt::as_i32(0i32) as u8)?;
                             caller_memory.store(
@@ -607,8 +607,8 @@ pub mod imports {
                         Z1::B => {
                             let e = ();
                             {
-                                let caller_memory =
-                                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                                let _memory_view = _memory.view(&store);
+                                let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                                 caller_memory
                                     .store(arg8 + 0, wit_bindgen_wasmer::rt::as_i32(1i32) as u8)?;
                                 let () = e;
@@ -617,8 +617,8 @@ pub mod imports {
                     };
                     match t0_1 {
                         Z2::A(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg8 + 8, wit_bindgen_wasmer::rt::as_i32(0i32) as u8)?;
                             caller_memory.store(
@@ -629,8 +629,8 @@ pub mod imports {
                         Z2::B => {
                             let e = ();
                             {
-                                let caller_memory =
-                                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                                let _memory_view = _memory.view(&store);
+                                let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                                 caller_memory
                                     .store(arg8 + 8, wit_bindgen_wasmer::rt::as_i32(1i32) as u8)?;
                                 let () = e;
@@ -639,8 +639,8 @@ pub mod imports {
                     };
                     match t0_2 {
                         Z3::A(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg8 + 24, wit_bindgen_wasmer::rt::as_i32(0i32) as u8)?;
                             caller_memory.store(arg8 + 28, wit_bindgen_wasmer::rt::as_f32(e))?;
@@ -648,8 +648,8 @@ pub mod imports {
                         Z3::B => {
                             let e = ();
                             {
-                                let caller_memory =
-                                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                                let _memory_view = _memory.view(&store);
+                                let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                                 caller_memory
                                     .store(arg8 + 24, wit_bindgen_wasmer::rt::as_i32(1i32) as u8)?;
                                 let () = e;
@@ -658,8 +658,8 @@ pub mod imports {
                     };
                     match t0_3 {
                         Z4::A(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg8 + 32, wit_bindgen_wasmer::rt::as_i32(0i32) as u8)?;
                             caller_memory.store(arg8 + 40, wit_bindgen_wasmer::rt::as_f64(e))?;
@@ -667,8 +667,8 @@ pub mod imports {
                         Z4::B => {
                             let e = ();
                             {
-                                let caller_memory =
-                                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                                let _memory_view = _memory.view(&store);
+                                let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                                 caller_memory
                                     .store(arg8 + 32, wit_bindgen_wasmer::rt::as_i32(1i32) as u8)?;
                                 let () = e;
@@ -681,7 +681,7 @@ pub mod imports {
         );
         exports.insert(
             "variant-typedefs",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -717,7 +717,7 @@ pub mod imports {
         );
         exports.insert(
             "variant-enums",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -747,8 +747,8 @@ pub mod imports {
                     let host = &mut data_mut.data;
                     let result = host.variant_enums(param0, param1, param2);
                     let (t0_0, t0_1, t0_2) = result;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store(
                         arg3 + 0,
                         wit_bindgen_wasmer::rt::as_i32(match t0_0 {
@@ -763,15 +763,15 @@ pub mod imports {
                             let () = e;
                         }
                         Err(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg3 + 1, wit_bindgen_wasmer::rt::as_i32(1i32) as u8)?;
                             let () = e;
                         }
                     };
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory
                         .store(arg3 + 2, wit_bindgen_wasmer::rt::as_i32(t0_2 as i32) as u8)?;
                     Ok(())

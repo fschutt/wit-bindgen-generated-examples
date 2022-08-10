@@ -281,10 +281,10 @@ pub mod records {
         ) -> Result<(char, u32), wasmer::RuntimeError> {
             let _memory = &self.memory;
             let result0 = self.func_tuple_result.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
             Ok((char_from_i32(load1)?, load2 as u32))
         }
         pub fn empty_arg(
@@ -322,10 +322,10 @@ pub mod records {
         ) -> Result<Scalars, wasmer::RuntimeError> {
             let _memory = &self.memory;
             let result0 = self.func_scalar_result.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
             Ok(Scalars {
                 a: load1 as u32,
                 b: load2 as u32,
@@ -394,24 +394,24 @@ pub mod records {
         ) -> Result<ReallyFlags, wasmer::RuntimeError> {
             let _memory = &self.memory;
             let result0 = self.func_flags_result.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 1)?;
-            let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 2)?;
-            let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 3)?;
-            let load5 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 4)?;
-            let load6 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 5)?;
-            let load7 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 6)?;
-            let load8 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 7)?;
-            let load9 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 8)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 1)?;
+            let _memory_view = _memory.view(&store);
+            let load3 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 2)?;
+            let _memory_view = _memory.view(&store);
+            let load4 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 3)?;
+            let _memory_view = _memory.view(&store);
+            let load5 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load6 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 5)?;
+            let _memory_view = _memory.view(&store);
+            let load7 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 6)?;
+            let _memory_view = _memory.view(&store);
+            let load8 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 7)?;
+            let _memory_view = _memory.view(&store);
+            let load9 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 8)?;
             Ok(ReallyFlags {
                 a: match i32::from(load1) {
                     0 => false,
@@ -484,8 +484,8 @@ pub mod records {
                 1,
                 vec3.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr3, vec3.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr3, vec3.as_bytes())?;
             let ReallyFlags {
                 a: a4,
                 b: b4,
@@ -550,38 +550,38 @@ pub mod records {
             let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let result0 = self.func_aggregate_result.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
-            let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 8)?;
-            let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 12)?;
-            let load5 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 16)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load3 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 8)?;
+            let _memory_view = _memory.view(&store);
+            let load4 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 12)?;
+            let _memory_view = _memory.view(&store);
+            let load5 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 16)?;
             let ptr6 = load4;
             let len6 = load5;
 
             let data6 = copy_slice(store, _memory, func_canonical_abi_free, ptr6, len6, 1)?;
-            let load7 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 20)?;
-            let load8 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 21)?;
-            let load9 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 22)?;
-            let load10 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 23)?;
-            let load11 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 24)?;
-            let load12 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 25)?;
-            let load13 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 26)?;
-            let load14 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 27)?;
-            let load15 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 28)?;
+            let _memory_view = _memory.view(&store);
+            let load7 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 20)?;
+            let _memory_view = _memory.view(&store);
+            let load8 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 21)?;
+            let _memory_view = _memory.view(&store);
+            let load9 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 22)?;
+            let _memory_view = _memory.view(&store);
+            let load10 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 23)?;
+            let _memory_view = _memory.view(&store);
+            let load11 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 24)?;
+            let _memory_view = _memory.view(&store);
+            let load12 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 25)?;
+            let _memory_view = _memory.view(&store);
+            let load13 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 26)?;
+            let _memory_view = _memory.view(&store);
+            let load14 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 27)?;
+            let _memory_view = _memory.view(&store);
+            let load15 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 28)?;
             Ok(AggregatesResult {
                 a: Scalars {
                     a: load1 as u32,

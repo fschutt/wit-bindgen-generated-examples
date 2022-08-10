@@ -52,7 +52,7 @@ pub mod imports {
         let mut store = store.as_store_mut();
         exports.insert(
             "roundtrip-u8",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -68,7 +68,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-s8",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -84,7 +84,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-u16",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -100,7 +100,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-s16",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -116,7 +116,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-u32",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -132,7 +132,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-s32",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -148,7 +148,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-u64",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -164,7 +164,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-s64",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -180,7 +180,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-float32",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -196,7 +196,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-float64",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -212,7 +212,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-char",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -228,7 +228,7 @@ pub mod imports {
         );
         exports.insert(
             "set-scalar",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -245,7 +245,7 @@ pub mod imports {
         );
         exports.insert(
     "get-scalar",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<i32, wasmer::RuntimeError> {

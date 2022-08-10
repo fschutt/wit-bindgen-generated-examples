@@ -132,7 +132,7 @@ pub mod exports {
 
             canonical_abi.insert(
                 "resource_drop_wasm-state",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
@@ -151,7 +151,7 @@ pub mod exports {
             );
             canonical_abi.insert(
                 "resource_clone_wasm-state",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
@@ -166,7 +166,7 @@ pub mod exports {
             );
             canonical_abi.insert(
                 "resource_get_wasm-state",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
@@ -180,7 +180,7 @@ pub mod exports {
             );
             canonical_abi.insert(
                 "resource_new_wasm-state",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
@@ -195,7 +195,7 @@ pub mod exports {
 
             canonical_abi.insert(
                 "resource_drop_wasm-state2",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
@@ -214,7 +214,7 @@ pub mod exports {
             );
             canonical_abi.insert(
                 "resource_clone_wasm-state2",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
@@ -229,7 +229,7 @@ pub mod exports {
             );
             canonical_abi.insert(
                 "resource_get_wasm-state2",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
@@ -243,7 +243,7 @@ pub mod exports {
             );
             canonical_abi.insert(
                 "resource_new_wasm-state2",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
@@ -258,7 +258,7 @@ pub mod exports {
 
             canonical_abi.insert(
                 "resource_drop_markdown",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
@@ -277,7 +277,7 @@ pub mod exports {
             );
             canonical_abi.insert(
                 "resource_clone_markdown",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
@@ -292,7 +292,7 @@ pub mod exports {
             );
             canonical_abi.insert(
                 "resource_get_markdown",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
@@ -306,7 +306,7 @@ pub mod exports {
             );
             canonical_abi.insert(
                 "resource_new_markdown",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ExportsData>,
@@ -551,12 +551,12 @@ pub mod exports {
             let result2 = self
                 .func_two_wasm_states
                 .call(store, handle0 as i32, handle1 as i32)?;
-            let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result2 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load3 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result2 + 0)?;
             let state = self.env.as_mut(store);
             let handle4 = state.index_slab0.remove(load3 as u32)?;
-            let load5 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result2 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load5 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result2 + 4)?;
             let state = self.env.as_mut(store);
             let handle6 = state.index_slab1.remove(load5 as u32)?;
             Ok((WasmState(handle4), WasmState2(handle6)))
@@ -684,7 +684,8 @@ pub mod exports {
                         state.resource_slab1.clone(obj0.0)?;
                         state.index_slab1.insert(obj0.0)
                     };
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 0, wit_bindgen_wasmer::rt::as_i32(handle0 as i32))?;
                 }
             }
@@ -718,13 +719,14 @@ pub mod exports {
         ) -> Result<WasmStateResultOption, wasmer::RuntimeError> {
             let _memory = &self.memory;
             let result0 = self.func_wasm_state2_result_option.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 0)?;
             Ok(match i32::from(load1) {
                 0 => None,
                 1 => Some({
-                    let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(result0 + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load2 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
                     let state = self.env.as_mut(store);
                     let handle3 = state.index_slab1.remove(load2 as u32)?;
                     WasmState2(handle3)
@@ -738,19 +740,21 @@ pub mod exports {
         ) -> Result<WasmStateResultResult, wasmer::RuntimeError> {
             let _memory = &self.memory;
             let result0 = self.func_wasm_state2_result_result.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 0)?;
             Ok(match i32::from(load1) {
                 0 => Ok({
-                    let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(result0 + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load2 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
                     let state = self.env.as_mut(store);
                     let handle3 = state.index_slab1.remove(load2 as u32)?;
                     WasmState2(handle3)
                 }),
                 1 => Err({
-                    let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(result0 + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load4 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
                     load4 as u32
                 }),
                 _ => return Err(invalid_variant("expected")),
@@ -762,19 +766,21 @@ pub mod exports {
         ) -> Result<WasmStateResultVariant, wasmer::RuntimeError> {
             let _memory = &self.memory;
             let result0 = self.func_wasm_state2_result_variant.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 0)?;
             Ok(match i32::from(load1) {
                 0 => WasmStateResultVariant::WasmState2({
-                    let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(result0 + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load2 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
                     let state = self.env.as_mut(store);
                     let handle3 = state.index_slab1.remove(load2 as u32)?;
                     WasmState2(handle3)
                 }),
                 1 => WasmStateResultVariant::U32({
-                    let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(result0 + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load4 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
                     load4 as u32
                 }),
                 _ => return Err(invalid_variant("WasmStateResultVariant")),
@@ -787,18 +793,19 @@ pub mod exports {
             let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let result0 = self.func_wasm_state2_result_list.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
             let len5 = load2;
             let base5 = load1;
             let mut result5 = Vec::with_capacity(len5 as usize);
             for i in 0..len5 {
                 let base = base5 + i * 4;
                 result5.push({
-                    let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 0)?;
+                    let _memory_view = _memory.view(&store);
+                    let load3 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 0)?;
                     let state = self.env.as_mut(store);
                     let handle4 = state.index_slab1.remove(load3 as u32)?;
                     WasmState2(handle4)
@@ -813,13 +820,14 @@ pub mod exports {
         ) -> Result<Option<Markdown>, wasmer::RuntimeError> {
             let _memory = &self.memory;
             let result0 = self.func_markdown_create.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 0)?;
             Ok(match i32::from(load1) {
                 0 => None,
                 1 => Some({
-                    let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(result0 + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load2 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
                     let state = self.env.as_mut(store);
                     let handle3 = state.index_slab2.remove(load2 as u32)?;
                     Markdown(handle3)
@@ -850,8 +858,8 @@ pub mod exports {
                 1,
                 vec1.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr1, vec1.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr1, vec1.as_bytes())?;
             self.func_markdown_append
                 .call(store, handle0 as i32, ptr1, vec1.len() as i32)?;
             Ok(())
@@ -871,10 +879,10 @@ pub mod exports {
                 state.index_slab2.insert(obj0.0)
             };
             let result1 = self.func_markdown_render.call(store, handle0 as i32)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result1 + 0)?;
-            let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result1 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load3 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 4)?;
             let ptr4 = load2;
             let len4 = load3;
 

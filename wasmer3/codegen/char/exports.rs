@@ -32,7 +32,7 @@ pub mod char {
         let mut store = store.as_store_mut();
         exports.insert(
             "take-char",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -49,7 +49,7 @@ pub mod char {
         );
         exports.insert(
     "return-char",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<i32, wasmer::RuntimeError> {

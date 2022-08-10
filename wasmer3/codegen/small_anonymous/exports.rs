@@ -51,7 +51,7 @@ pub mod small_anonymous {
         let mut store = store.as_store_mut();
         exports.insert(
             "option-test",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -70,15 +70,15 @@ pub mod small_anonymous {
                     let result = host.option_test();
                     match result {
                         Ok(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg0 + 0, wit_bindgen_wasmer::rt::as_i32(0i32) as u8)?;
                             match e {
                                 Some(e) => {
-                                    let caller_memory = unsafe {
-                                        _memory.data_unchecked_mut(&store.as_store_ref())
-                                    };
+                                    let _memory_view = _memory.view(&store);
+                                    let caller_memory =
+                                        unsafe { _memory_view.data_unchecked_mut() };
                                     caller_memory.store(
                                         arg0 + 4,
                                         wit_bindgen_wasmer::rt::as_i32(1i32) as u8,
@@ -91,9 +91,9 @@ pub mod small_anonymous {
                                         1,
                                         vec0.len() as i32,
                                     )?;
-                                    let caller_memory = unsafe {
-                                        _memory.data_unchecked_mut(&store.as_store_ref())
-                                    };
+                                    let _memory_view = _memory.view(&store);
+                                    let caller_memory =
+                                        unsafe { _memory_view.data_unchecked_mut() };
                                     caller_memory.store_many(ptr0, vec0.as_bytes())?;
                                     caller_memory.store(
                                         arg0 + 12,
@@ -115,8 +115,8 @@ pub mod small_anonymous {
                             };
                         }
                         Err(e) => {
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory
                                 .store(arg0 + 0, wit_bindgen_wasmer::rt::as_i32(1i32) as u8)?;
                             caller_memory

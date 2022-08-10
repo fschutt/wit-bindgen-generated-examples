@@ -224,10 +224,10 @@ pub mod integers {
         ) -> Result<(i64, u8), wasmer::RuntimeError> {
             let _memory = &self.memory;
             let result0 = self.func_pair_ret.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i64>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 8)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i64>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 8)?;
             Ok((load1, u8::try_from(i32::from(load2)).map_err(bad_int)?))
         }
     }

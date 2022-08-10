@@ -98,21 +98,22 @@ pub mod small_anonymous {
             let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let result0 = self.func_option_test.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 0)?;
             Ok(match i32::from(load1) {
                 0 => Ok({
-                    let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<u8>(result0 + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load2 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 4)?;
                     match i32::from(load2) {
                         0 => None,
                         1 => Some({
-                            let load3 =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                                    .load::<i32>(result0 + 8)?;
-                            let load4 =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                                    .load::<i32>(result0 + 12)?;
+                            let _memory_view = _memory.view(&store);
+                            let load3 = unsafe { _memory_view.data_unchecked_mut() }
+                                .load::<i32>(result0 + 8)?;
+                            let _memory_view = _memory.view(&store);
+                            let load4 = unsafe { _memory_view.data_unchecked_mut() }
+                                .load::<i32>(result0 + 12)?;
                             let ptr5 = load3;
                             let len5 = load4;
 
@@ -125,8 +126,9 @@ pub mod small_anonymous {
                     }
                 }),
                 1 => Err({
-                    let load6 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<u8>(result0 + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load6 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 4)?;
                     match i32::from(load6) {
                         0 => Error::Success,
                         1 => Error::Failure,

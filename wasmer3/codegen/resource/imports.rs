@@ -48,7 +48,7 @@ pub mod resource {
 
             canonical_abi.insert(
                 "resource_drop_x",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ResourceData>,
@@ -67,7 +67,7 @@ pub mod resource {
             );
             canonical_abi.insert(
                 "resource_clone_x",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ResourceData>,
@@ -82,7 +82,7 @@ pub mod resource {
             );
             canonical_abi.insert(
                 "resource_get_x",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ResourceData>,
@@ -96,7 +96,7 @@ pub mod resource {
             );
             canonical_abi.insert(
                 "resource_new_x",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ResourceData>,
@@ -111,7 +111,7 @@ pub mod resource {
 
             canonical_abi.insert(
                 "resource_drop_y",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ResourceData>,
@@ -130,7 +130,7 @@ pub mod resource {
             );
             canonical_abi.insert(
                 "resource_clone_y",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ResourceData>,
@@ -145,7 +145,7 @@ pub mod resource {
             );
             canonical_abi.insert(
                 "resource_get_y",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ResourceData>,
@@ -159,7 +159,7 @@ pub mod resource {
             );
             canonical_abi.insert(
                 "resource_new_y",
-                wasmer::Function::new_native(
+                wasmer::Function::new_typed_with_env(
                     &mut store,
                     &env,
                     move |mut store: wasmer::FunctionEnvMut<ResourceData>,
@@ -338,10 +338,10 @@ pub mod resource {
                 state.index_slab1.insert(obj0.0)
             };
             let result1 = self.func_y_method_with_result.call(store, handle0 as i32)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result1 + 0)?;
-            let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result1 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load3 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 4)?;
             let ptr4 = load2;
             let len4 = load3;
 

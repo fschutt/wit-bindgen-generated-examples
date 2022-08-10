@@ -285,7 +285,7 @@ pub mod imports {
         let mut store = store.as_store_mut();
         exports.insert(
             "multiple-results",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -296,8 +296,8 @@ pub mod imports {
                     let host = &mut data_mut.data;
                     let result = host.multiple_results();
                     let (t0_0, t0_1) = result;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store(
                         arg0 + 0,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(t0_0)) as u8,
@@ -312,7 +312,7 @@ pub mod imports {
         );
         exports.insert(
             "swap-tuple",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -326,8 +326,8 @@ pub mod imports {
                     let host = &mut data_mut.data;
                     let result = host.swap_tuple(param0);
                     let (t0_0, t0_1) = result;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store(
                         arg2 + 0,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(t0_0)),
@@ -342,7 +342,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-flags1",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -363,7 +363,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-flags2",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -384,7 +384,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-flags3",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -425,8 +425,8 @@ pub mod imports {
                     let result = host.roundtrip_flags3(param0, param1, param2, param3);
                     let (t0_0, t0_1, t0_2, t0_3) = result;
                     let flags1 = t0_0;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store(
                         arg5 + 0,
                         wit_bindgen_wasmer::rt::as_i32((flags1.bits >> 0) as i32) as u8,
@@ -456,7 +456,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-record1",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -478,8 +478,8 @@ pub mod imports {
                     let host = &mut data_mut.data;
                     let result = host.roundtrip_record1(param0);
                     let R1 { a: a0, b: b0 } = result;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store(
                         arg2 + 0,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(a0)) as u8,
@@ -495,7 +495,7 @@ pub mod imports {
         );
         exports.insert(
     "tuple0",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {
@@ -510,7 +510,7 @@ pub mod imports {
     ));
         exports.insert(
             "tuple1",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,

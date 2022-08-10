@@ -41,14 +41,9 @@ branch = "silwol/wasmer2"
 EOF
 
 cat >> wasmer3/Cargo.toml<< EOF
-
-[dependencies.wasmer]
-git = "https://github.com/wasmerio/wasmer"
-branch = "master"
-
 [dependencies.wit-bindgen-wasmer]
 git = "https://github.com/wasmerio/wit-bindgen"
-branch = "silwol/wasmer3"
+branch = "silwol/memory_view"
 EOF
 
 generate() {
