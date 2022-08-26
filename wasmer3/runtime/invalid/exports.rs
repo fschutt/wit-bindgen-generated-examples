@@ -83,7 +83,7 @@ pub mod imports {
         let mut store = store.as_store_mut();
         exports.insert(
             "roundtrip-u8",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -101,7 +101,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-s8",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -119,7 +119,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-u16",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -137,7 +137,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-s16",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -155,7 +155,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-char",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -173,7 +173,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-enum",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -196,7 +196,7 @@ pub mod imports {
         );
         exports.insert(
             "roundtrip-bool",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -221,7 +221,7 @@ pub mod imports {
         );
         exports.insert(
             "get-internal",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -246,7 +246,7 @@ pub mod imports {
             .unwrap_or_else(wasmer::Exports::new);
         canonical_abi.insert(
             "resource_drop_host-state",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,

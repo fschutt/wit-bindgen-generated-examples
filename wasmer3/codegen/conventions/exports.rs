@@ -87,7 +87,7 @@ pub mod conventions {
         let mut store = store.as_store_mut();
         exports.insert(
     "kebab-case",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {
@@ -100,7 +100,7 @@ pub mod conventions {
     ));
         exports.insert(
             "foo",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -121,7 +121,7 @@ pub mod conventions {
         );
         exports.insert(
     "function-with-dashes",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {
@@ -134,7 +134,7 @@ pub mod conventions {
     ));
         exports.insert(
     "function-with-no-weird-characters",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {
@@ -147,7 +147,7 @@ pub mod conventions {
     ));
         exports.insert(
     "apple",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {
@@ -160,7 +160,7 @@ pub mod conventions {
     ));
         exports.insert(
     "apple-pear",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {
@@ -173,7 +173,7 @@ pub mod conventions {
     ));
         exports.insert(
     "apple-pear-grape",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {
@@ -186,7 +186,7 @@ pub mod conventions {
     ));
         exports.insert(
     "garçon",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {
@@ -199,7 +199,7 @@ pub mod conventions {
     ));
         exports.insert(
     "hühnervögel",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {
@@ -212,7 +212,7 @@ pub mod conventions {
     ));
         exports.insert(
     "москва",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {
@@ -225,7 +225,7 @@ pub mod conventions {
     ));
         exports.insert(
     "東-京",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {
@@ -238,7 +238,7 @@ pub mod conventions {
     ));
         exports.insert(
     "garçon-hühnervögel-москва-東-京",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {
@@ -251,7 +251,7 @@ pub mod conventions {
     ));
         exports.insert(
     "a0",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {
@@ -264,7 +264,7 @@ pub mod conventions {
     ));
         exports.insert(
     "explicit",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {
@@ -277,7 +277,7 @@ pub mod conventions {
     ));
         exports.insert(
     "explicit-kebab",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {
@@ -290,7 +290,7 @@ pub mod conventions {
     ));
         exports.insert(
     "bool",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {

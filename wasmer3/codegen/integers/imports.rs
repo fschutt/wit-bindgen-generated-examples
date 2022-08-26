@@ -39,10 +39,10 @@ pub mod integers {
         /// This function returns the `IntegersData` which needs to be
         /// passed through to `Integers::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<IntegersData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, IntegersData::default());
             env
         }
 
@@ -57,12 +57,12 @@ pub mod integers {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
 
             Ok((Self::new(store, &instance, env)?, instance))
         }
@@ -75,28 +75,28 @@ pub mod integers {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<IntegersData>,
         ) -> Result<Self, wasmer::ExportError> {
-            let func_a1 = _instance.exports.get_typed_function(store, "a1")?;
-            let func_a2 = _instance.exports.get_typed_function(store, "a2")?;
-            let func_a3 = _instance.exports.get_typed_function(store, "a3")?;
-            let func_a4 = _instance.exports.get_typed_function(store, "a4")?;
-            let func_a5 = _instance.exports.get_typed_function(store, "a5")?;
-            let func_a6 = _instance.exports.get_typed_function(store, "a6")?;
-            let func_a7 = _instance.exports.get_typed_function(store, "a7")?;
-            let func_a8 = _instance.exports.get_typed_function(store, "a8")?;
-            let func_a9 = _instance.exports.get_typed_function(store, "a9")?;
-            let func_pair_ret = _instance.exports.get_typed_function(store, "pair-ret")?;
-            let func_r1 = _instance.exports.get_typed_function(store, "r1")?;
-            let func_r2 = _instance.exports.get_typed_function(store, "r2")?;
-            let func_r3 = _instance.exports.get_typed_function(store, "r3")?;
-            let func_r4 = _instance.exports.get_typed_function(store, "r4")?;
-            let func_r5 = _instance.exports.get_typed_function(store, "r5")?;
-            let func_r6 = _instance.exports.get_typed_function(store, "r6")?;
-            let func_r7 = _instance.exports.get_typed_function(store, "r7")?;
-            let func_r8 = _instance.exports.get_typed_function(store, "r8")?;
+            let func_a1 = _instance.exports.get_typed_function(&store, "a1")?;
+            let func_a2 = _instance.exports.get_typed_function(&store, "a2")?;
+            let func_a3 = _instance.exports.get_typed_function(&store, "a3")?;
+            let func_a4 = _instance.exports.get_typed_function(&store, "a4")?;
+            let func_a5 = _instance.exports.get_typed_function(&store, "a5")?;
+            let func_a6 = _instance.exports.get_typed_function(&store, "a6")?;
+            let func_a7 = _instance.exports.get_typed_function(&store, "a7")?;
+            let func_a8 = _instance.exports.get_typed_function(&store, "a8")?;
+            let func_a9 = _instance.exports.get_typed_function(&store, "a9")?;
+            let func_pair_ret = _instance.exports.get_typed_function(&store, "pair-ret")?;
+            let func_r1 = _instance.exports.get_typed_function(&store, "r1")?;
+            let func_r2 = _instance.exports.get_typed_function(&store, "r2")?;
+            let func_r3 = _instance.exports.get_typed_function(&store, "r3")?;
+            let func_r4 = _instance.exports.get_typed_function(&store, "r4")?;
+            let func_r5 = _instance.exports.get_typed_function(&store, "r5")?;
+            let func_r6 = _instance.exports.get_typed_function(&store, "r6")?;
+            let func_r7 = _instance.exports.get_typed_function(&store, "r7")?;
+            let func_r8 = _instance.exports.get_typed_function(&store, "r8")?;
             let memory = _instance.exports.get_memory("memory")?.clone();
             Ok(Integers {
                 func_a1,
@@ -224,10 +224,10 @@ pub mod integers {
         ) -> Result<(i64, u8), wasmer::RuntimeError> {
             let _memory = &self.memory;
             let result0 = self.func_pair_ret.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i64>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 8)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i64>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 8)?;
             Ok((load1, u8::try_from(i32::from(load2)).map_err(bad_int)?))
         }
     }

@@ -23,10 +23,10 @@ pub mod exports {
         /// This function returns the `ExportsData` which needs to be
         /// passed through to `Exports::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<ExportsData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, ExportsData::default());
             env
         }
 
@@ -41,12 +41,12 @@ pub mod exports {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
 
             Ok((Self::new(store, &instance, env)?, instance))
         }
@@ -59,16 +59,16 @@ pub mod exports {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<ExportsData>,
         ) -> Result<Self, wasmer::ExportError> {
             let func_canonical_abi_realloc = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_realloc")?;
+                .get_typed_function(&store, "canonical_abi_realloc")?;
             let func_many_arguments = _instance
                 .exports
-                .get_typed_function(store, "many-arguments")?;
+                .get_typed_function(&store, "many-arguments")?;
             let memory = _instance.exports.get_memory("memory")?.clone();
             Ok(Exports {
                 func_canonical_abi_realloc,
@@ -104,83 +104,103 @@ pub mod exports {
             let func_canonical_abi_realloc = &self.func_canonical_abi_realloc;
             let _memory = &self.memory;
             let ptr0 = func_canonical_abi_realloc.call(store, 0, 0, 8, 160)?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 0,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a1)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 8,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a2)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 16,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a3)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 24,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a4)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 32,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a5)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 40,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a6)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 48,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a7)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 56,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a8)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 64,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a9)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 72,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a10)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 80,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a11)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 88,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a12)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 96,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a13)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 104,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a14)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 112,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a15)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 120,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a16)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 128,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a17)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 136,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a18)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 144,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a19)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 152,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a20)),
             )?;

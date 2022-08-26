@@ -259,10 +259,10 @@ pub mod flags {
         /// This function returns the `FlagsData` which needs to be
         /// passed through to `Flags::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<FlagsData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, FlagsData::default());
             env
         }
 
@@ -277,12 +277,12 @@ pub mod flags {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
 
             Ok((Self::new(store, &instance, env)?, instance))
         }
@@ -295,31 +295,31 @@ pub mod flags {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<FlagsData>,
         ) -> Result<Self, wasmer::ExportError> {
             let func_roundtrip_flag1 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-flag1")?;
+                .get_typed_function(&store, "roundtrip-flag1")?;
             let func_roundtrip_flag16 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-flag16")?;
+                .get_typed_function(&store, "roundtrip-flag16")?;
             let func_roundtrip_flag2 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-flag2")?;
+                .get_typed_function(&store, "roundtrip-flag2")?;
             let func_roundtrip_flag32 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-flag32")?;
+                .get_typed_function(&store, "roundtrip-flag32")?;
             let func_roundtrip_flag4 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-flag4")?;
+                .get_typed_function(&store, "roundtrip-flag4")?;
             let func_roundtrip_flag64 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-flag64")?;
+                .get_typed_function(&store, "roundtrip-flag64")?;
             let func_roundtrip_flag8 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-flag8")?;
+                .get_typed_function(&store, "roundtrip-flag8")?;
             let memory = _instance.exports.get_memory("memory")?.clone();
             Ok(Flags {
                 func_roundtrip_flag1,
@@ -441,10 +441,10 @@ pub mod flags {
                 (flags0.bits >> 0) as i32,
                 (flags0.bits >> 32) as i32,
             )?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result1 + 0)?;
-            let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result1 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load3 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 4)?;
             Ok(validate_flags(
                 0 | ((load2 as u64) << 0) | ((load3 as u64) << 32),
                 Flag64::all().bits(),

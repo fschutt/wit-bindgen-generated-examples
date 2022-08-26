@@ -73,10 +73,10 @@ pub mod many_arguments {
         /// This function returns the `ManyArgumentsData` which needs to be
         /// passed through to `ManyArguments::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<ManyArgumentsData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, ManyArgumentsData::default());
             env
         }
 
@@ -91,12 +91,12 @@ pub mod many_arguments {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
 
             Ok((Self::new(store, &instance, env)?, instance))
         }
@@ -109,17 +109,17 @@ pub mod many_arguments {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<ManyArgumentsData>,
         ) -> Result<Self, wasmer::ExportError> {
             let func_big_argument = _instance
                 .exports
-                .get_typed_function(store, "big-argument")?;
+                .get_typed_function(&store, "big-argument")?;
             let func_canonical_abi_realloc = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_realloc")?;
-            let func_many_args = _instance.exports.get_typed_function(store, "many-args")?;
+                .get_typed_function(&store, "canonical_abi_realloc")?;
+            let func_many_args = _instance.exports.get_typed_function(&store, "many-args")?;
             let memory = _instance.exports.get_memory("memory")?.clone();
             Ok(ManyArguments {
                 func_big_argument,
@@ -156,83 +156,103 @@ pub mod many_arguments {
             let func_canonical_abi_realloc = &self.func_canonical_abi_realloc;
             let _memory = &self.memory;
             let ptr0 = func_canonical_abi_realloc.call(store, 0, 0, 8, 160)?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 0,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a1)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 8,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a2)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 16,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a3)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 24,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a4)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 32,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a5)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 40,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a6)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 48,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a7)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 56,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a8)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 64,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a9)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 72,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a10)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 80,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a11)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 88,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a12)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 96,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a13)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 104,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a14)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 112,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a15)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 120,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a16)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 128,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a17)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 136,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a18)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 144,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a19)),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 152,
                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a20)),
             )?;
@@ -277,11 +297,13 @@ pub mod many_arguments {
                 1,
                 vec2.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr2, vec2.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr2, vec2.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 4, wit_bindgen_wasmer::rt::as_i32(vec2.len() as i32))?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 0, wit_bindgen_wasmer::rt::as_i32(ptr2))?;
             let vec3 = a21;
             let ptr3 = func_canonical_abi_realloc.call(
@@ -291,11 +313,13 @@ pub mod many_arguments {
                 1,
                 vec3.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr3, vec3.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr3, vec3.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 12, wit_bindgen_wasmer::rt::as_i32(vec3.len() as i32))?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 8, wit_bindgen_wasmer::rt::as_i32(ptr3))?;
             let vec4 = a31;
             let ptr4 = func_canonical_abi_realloc.call(
@@ -305,11 +329,13 @@ pub mod many_arguments {
                 1,
                 vec4.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr4, vec4.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr4, vec4.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 20, wit_bindgen_wasmer::rt::as_i32(vec4.len() as i32))?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 16, wit_bindgen_wasmer::rt::as_i32(ptr4))?;
             let vec5 = a41;
             let ptr5 = func_canonical_abi_realloc.call(
@@ -319,11 +345,13 @@ pub mod many_arguments {
                 1,
                 vec5.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr5, vec5.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr5, vec5.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 28, wit_bindgen_wasmer::rt::as_i32(vec5.len() as i32))?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 24, wit_bindgen_wasmer::rt::as_i32(ptr5))?;
             let vec6 = a51;
             let ptr6 = func_canonical_abi_realloc.call(
@@ -333,11 +361,13 @@ pub mod many_arguments {
                 1,
                 vec6.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr6, vec6.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr6, vec6.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 36, wit_bindgen_wasmer::rt::as_i32(vec6.len() as i32))?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 32, wit_bindgen_wasmer::rt::as_i32(ptr6))?;
             let vec7 = a61;
             let ptr7 = func_canonical_abi_realloc.call(
@@ -347,11 +377,13 @@ pub mod many_arguments {
                 1,
                 vec7.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr7, vec7.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr7, vec7.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 44, wit_bindgen_wasmer::rt::as_i32(vec7.len() as i32))?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 40, wit_bindgen_wasmer::rt::as_i32(ptr7))?;
             let vec8 = a71;
             let ptr8 = func_canonical_abi_realloc.call(
@@ -361,11 +393,13 @@ pub mod many_arguments {
                 1,
                 vec8.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr8, vec8.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr8, vec8.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 52, wit_bindgen_wasmer::rt::as_i32(vec8.len() as i32))?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 48, wit_bindgen_wasmer::rt::as_i32(ptr8))?;
             let vec9 = a81;
             let ptr9 = func_canonical_abi_realloc.call(
@@ -375,11 +409,13 @@ pub mod many_arguments {
                 1,
                 vec9.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr9, vec9.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr9, vec9.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 60, wit_bindgen_wasmer::rt::as_i32(vec9.len() as i32))?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 56, wit_bindgen_wasmer::rt::as_i32(ptr9))?;
             let vec10 = a91;
             let ptr10 = func_canonical_abi_realloc.call(
@@ -389,13 +425,15 @@ pub mod many_arguments {
                 1,
                 vec10.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr10, vec10.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr10, vec10.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 68,
                 wit_bindgen_wasmer::rt::as_i32(vec10.len() as i32),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 64, wit_bindgen_wasmer::rt::as_i32(ptr10))?;
             let vec11 = a101;
             let ptr11 = func_canonical_abi_realloc.call(
@@ -405,13 +443,15 @@ pub mod many_arguments {
                 1,
                 vec11.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr11, vec11.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr11, vec11.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 76,
                 wit_bindgen_wasmer::rt::as_i32(vec11.len() as i32),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 72, wit_bindgen_wasmer::rt::as_i32(ptr11))?;
             let vec12 = a111;
             let ptr12 = func_canonical_abi_realloc.call(
@@ -421,13 +461,15 @@ pub mod many_arguments {
                 1,
                 vec12.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr12, vec12.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr12, vec12.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 84,
                 wit_bindgen_wasmer::rt::as_i32(vec12.len() as i32),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 80, wit_bindgen_wasmer::rt::as_i32(ptr12))?;
             let vec13 = a121;
             let ptr13 = func_canonical_abi_realloc.call(
@@ -437,13 +479,15 @@ pub mod many_arguments {
                 1,
                 vec13.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr13, vec13.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr13, vec13.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 92,
                 wit_bindgen_wasmer::rt::as_i32(vec13.len() as i32),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 88, wit_bindgen_wasmer::rt::as_i32(ptr13))?;
             let vec14 = a131;
             let ptr14 = func_canonical_abi_realloc.call(
@@ -453,13 +497,15 @@ pub mod many_arguments {
                 1,
                 vec14.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr14, vec14.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr14, vec14.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 100,
                 wit_bindgen_wasmer::rt::as_i32(vec14.len() as i32),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 96, wit_bindgen_wasmer::rt::as_i32(ptr14))?;
             let vec15 = a141;
             let ptr15 = func_canonical_abi_realloc.call(
@@ -469,13 +515,15 @@ pub mod many_arguments {
                 1,
                 vec15.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr15, vec15.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr15, vec15.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 108,
                 wit_bindgen_wasmer::rt::as_i32(vec15.len() as i32),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 104, wit_bindgen_wasmer::rt::as_i32(ptr15))?;
             let vec16 = a151;
             let ptr16 = func_canonical_abi_realloc.call(
@@ -485,13 +533,15 @@ pub mod many_arguments {
                 1,
                 vec16.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr16, vec16.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr16, vec16.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 116,
                 wit_bindgen_wasmer::rt::as_i32(vec16.len() as i32),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 112, wit_bindgen_wasmer::rt::as_i32(ptr16))?;
             let vec17 = a161;
             let ptr17 = func_canonical_abi_realloc.call(
@@ -501,13 +551,15 @@ pub mod many_arguments {
                 1,
                 vec17.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr17, vec17.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr17, vec17.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 124,
                 wit_bindgen_wasmer::rt::as_i32(vec17.len() as i32),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 120, wit_bindgen_wasmer::rt::as_i32(ptr17))?;
             let vec18 = a171;
             let ptr18 = func_canonical_abi_realloc.call(
@@ -517,13 +569,15 @@ pub mod many_arguments {
                 1,
                 vec18.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr18, vec18.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr18, vec18.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 132,
                 wit_bindgen_wasmer::rt::as_i32(vec18.len() as i32),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 128, wit_bindgen_wasmer::rt::as_i32(ptr18))?;
             let vec19 = a181;
             let ptr19 = func_canonical_abi_realloc.call(
@@ -533,13 +587,15 @@ pub mod many_arguments {
                 1,
                 vec19.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr19, vec19.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr19, vec19.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 140,
                 wit_bindgen_wasmer::rt::as_i32(vec19.len() as i32),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 136, wit_bindgen_wasmer::rt::as_i32(ptr19))?;
             let vec20 = a191;
             let ptr20 = func_canonical_abi_realloc.call(
@@ -549,13 +605,15 @@ pub mod many_arguments {
                 1,
                 vec20.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr20, vec20.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr20, vec20.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 148,
                 wit_bindgen_wasmer::rt::as_i32(vec20.len() as i32),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 144, wit_bindgen_wasmer::rt::as_i32(ptr20))?;
             let vec21 = a201;
             let ptr21 = func_canonical_abi_realloc.call(
@@ -565,13 +623,15 @@ pub mod many_arguments {
                 1,
                 vec21.len() as i32,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .store_many(ptr21, vec21.as_bytes())?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr21, vec21.as_bytes())?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store(
                 ptr0 + 156,
                 wit_bindgen_wasmer::rt::as_i32(vec21.len() as i32),
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }
                 .store(ptr0 + 152, wit_bindgen_wasmer::rt::as_i32(ptr21))?;
             self.func_big_argument.call(store, ptr0)?;
             Ok(())

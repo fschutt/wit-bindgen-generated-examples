@@ -207,10 +207,10 @@ pub mod lists {
         /// This function returns the `ListsData` which needs to be
         /// passed through to `Lists::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<ListsData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, ListsData::default());
             env
         }
 
@@ -225,12 +225,12 @@ pub mod lists {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
 
             Ok((Self::new(store, &instance, env)?, instance))
         }
@@ -243,93 +243,101 @@ pub mod lists {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<ListsData>,
         ) -> Result<Self, wasmer::ExportError> {
             let func_canonical_abi_free = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_free")?;
+                .get_typed_function(&store, "canonical_abi_free")?;
             let func_canonical_abi_realloc = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_realloc")?;
+                .get_typed_function(&store, "canonical_abi_realloc")?;
             let func_list_float32_param = _instance
                 .exports
-                .get_typed_function(store, "list-float32-param")?;
+                .get_typed_function(&store, "list-float32-param")?;
             let func_list_float32_ret = _instance
                 .exports
-                .get_typed_function(store, "list-float32-ret")?;
+                .get_typed_function(&store, "list-float32-ret")?;
             let func_list_float64_param = _instance
                 .exports
-                .get_typed_function(store, "list-float64-param")?;
+                .get_typed_function(&store, "list-float64-param")?;
             let func_list_float64_ret = _instance
                 .exports
-                .get_typed_function(store, "list-float64-ret")?;
+                .get_typed_function(&store, "list-float64-ret")?;
             let func_list_s16_param = _instance
                 .exports
-                .get_typed_function(store, "list-s16-param")?;
+                .get_typed_function(&store, "list-s16-param")?;
             let func_list_s16_ret = _instance
                 .exports
-                .get_typed_function(store, "list-s16-ret")?;
+                .get_typed_function(&store, "list-s16-ret")?;
             let func_list_s32_param = _instance
                 .exports
-                .get_typed_function(store, "list-s32-param")?;
+                .get_typed_function(&store, "list-s32-param")?;
             let func_list_s32_ret = _instance
                 .exports
-                .get_typed_function(store, "list-s32-ret")?;
+                .get_typed_function(&store, "list-s32-ret")?;
             let func_list_s64_param = _instance
                 .exports
-                .get_typed_function(store, "list-s64-param")?;
+                .get_typed_function(&store, "list-s64-param")?;
             let func_list_s64_ret = _instance
                 .exports
-                .get_typed_function(store, "list-s64-ret")?;
+                .get_typed_function(&store, "list-s64-ret")?;
             let func_list_s8_param = _instance
                 .exports
-                .get_typed_function(store, "list-s8-param")?;
-            let func_list_s8_ret = _instance.exports.get_typed_function(store, "list-s8-ret")?;
+                .get_typed_function(&store, "list-s8-param")?;
+            let func_list_s8_ret = _instance
+                .exports
+                .get_typed_function(&store, "list-s8-ret")?;
             let func_list_u16_param = _instance
                 .exports
-                .get_typed_function(store, "list-u16-param")?;
+                .get_typed_function(&store, "list-u16-param")?;
             let func_list_u16_ret = _instance
                 .exports
-                .get_typed_function(store, "list-u16-ret")?;
+                .get_typed_function(&store, "list-u16-ret")?;
             let func_list_u32_param = _instance
                 .exports
-                .get_typed_function(store, "list-u32-param")?;
+                .get_typed_function(&store, "list-u32-param")?;
             let func_list_u32_ret = _instance
                 .exports
-                .get_typed_function(store, "list-u32-ret")?;
+                .get_typed_function(&store, "list-u32-ret")?;
             let func_list_u64_param = _instance
                 .exports
-                .get_typed_function(store, "list-u64-param")?;
+                .get_typed_function(&store, "list-u64-param")?;
             let func_list_u64_ret = _instance
                 .exports
-                .get_typed_function(store, "list-u64-ret")?;
+                .get_typed_function(&store, "list-u64-ret")?;
             let func_list_u8_param = _instance
                 .exports
-                .get_typed_function(store, "list-u8-param")?;
-            let func_list_u8_ret = _instance.exports.get_typed_function(store, "list-u8-ret")?;
+                .get_typed_function(&store, "list-u8-param")?;
+            let func_list_u8_ret = _instance
+                .exports
+                .get_typed_function(&store, "list-u8-ret")?;
             let func_load_store_everything = _instance
                 .exports
-                .get_typed_function(store, "load-store-everything")?;
-            let func_record_list = _instance.exports.get_typed_function(store, "record-list")?;
+                .get_typed_function(&store, "load-store-everything")?;
+            let func_record_list = _instance
+                .exports
+                .get_typed_function(&store, "record-list")?;
             let func_record_list_reverse = _instance
                 .exports
-                .get_typed_function(store, "record-list-reverse")?;
-            let func_string_list = _instance.exports.get_typed_function(store, "string-list")?;
+                .get_typed_function(&store, "record-list-reverse")?;
+            let func_string_list = _instance
+                .exports
+                .get_typed_function(&store, "string-list")?;
             let func_string_list_arg = _instance
                 .exports
-                .get_typed_function(store, "string-list-arg")?;
+                .get_typed_function(&store, "string-list-arg")?;
             let func_string_list_ret = _instance
                 .exports
-                .get_typed_function(store, "string-list-ret")?;
-            let func_tuple_list = _instance.exports.get_typed_function(store, "tuple-list")?;
+                .get_typed_function(&store, "string-list-ret")?;
+            let func_tuple_list = _instance.exports.get_typed_function(&store, "tuple-list")?;
             let func_tuple_string_list = _instance
                 .exports
-                .get_typed_function(store, "tuple-string-list")?;
+                .get_typed_function(&store, "tuple-string-list")?;
             let func_variant_list = _instance
                 .exports
-                .get_typed_function(store, "variant-list")?;
+                .get_typed_function(&store, "variant-list")?;
             let memory = _instance.exports.get_memory("memory")?.clone();
             Ok(Lists {
                 func_canonical_abi_free,
@@ -382,7 +390,8 @@ pub mod lists {
                 1,
                 (vec0.len() as i32) * 1,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store_many(ptr0, &vec0)?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr0, &vec0)?;
             self.func_list_u8_param
                 .call(store, ptr0, vec0.len() as i32)?;
             Ok(())
@@ -402,7 +411,8 @@ pub mod lists {
                 2,
                 (vec0.len() as i32) * 2,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store_many(ptr0, &vec0)?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr0, &vec0)?;
             self.func_list_u16_param
                 .call(store, ptr0, vec0.len() as i32)?;
             Ok(())
@@ -422,7 +432,8 @@ pub mod lists {
                 4,
                 (vec0.len() as i32) * 4,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store_many(ptr0, &vec0)?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr0, &vec0)?;
             self.func_list_u32_param
                 .call(store, ptr0, vec0.len() as i32)?;
             Ok(())
@@ -442,7 +453,8 @@ pub mod lists {
                 8,
                 (vec0.len() as i32) * 8,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store_many(ptr0, &vec0)?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr0, &vec0)?;
             self.func_list_u64_param
                 .call(store, ptr0, vec0.len() as i32)?;
             Ok(())
@@ -462,7 +474,8 @@ pub mod lists {
                 1,
                 (vec0.len() as i32) * 1,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store_many(ptr0, &vec0)?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr0, &vec0)?;
             self.func_list_s8_param
                 .call(store, ptr0, vec0.len() as i32)?;
             Ok(())
@@ -482,7 +495,8 @@ pub mod lists {
                 2,
                 (vec0.len() as i32) * 2,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store_many(ptr0, &vec0)?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr0, &vec0)?;
             self.func_list_s16_param
                 .call(store, ptr0, vec0.len() as i32)?;
             Ok(())
@@ -502,7 +516,8 @@ pub mod lists {
                 4,
                 (vec0.len() as i32) * 4,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store_many(ptr0, &vec0)?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr0, &vec0)?;
             self.func_list_s32_param
                 .call(store, ptr0, vec0.len() as i32)?;
             Ok(())
@@ -522,7 +537,8 @@ pub mod lists {
                 8,
                 (vec0.len() as i32) * 8,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store_many(ptr0, &vec0)?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr0, &vec0)?;
             self.func_list_s64_param
                 .call(store, ptr0, vec0.len() as i32)?;
             Ok(())
@@ -542,7 +558,8 @@ pub mod lists {
                 4,
                 (vec0.len() as i32) * 4,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store_many(ptr0, &vec0)?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr0, &vec0)?;
             self.func_list_float32_param
                 .call(store, ptr0, vec0.len() as i32)?;
             Ok(())
@@ -562,7 +579,8 @@ pub mod lists {
                 8,
                 (vec0.len() as i32) * 8,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store_many(ptr0, &vec0)?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr0, &vec0)?;
             self.func_list_float64_param
                 .call(store, ptr0, vec0.len() as i32)?;
             Ok(())
@@ -574,10 +592,10 @@ pub mod lists {
             let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let result0 = self.func_list_u8_ret.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
             let ptr3 = load1;
             let len3 = load2;
             Ok(copy_slice(
@@ -596,10 +614,10 @@ pub mod lists {
             let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let result0 = self.func_list_u16_ret.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
             let ptr3 = load1;
             let len3 = load2;
             Ok(copy_slice(
@@ -618,10 +636,10 @@ pub mod lists {
             let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let result0 = self.func_list_u32_ret.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
             let ptr3 = load1;
             let len3 = load2;
             Ok(copy_slice(
@@ -640,10 +658,10 @@ pub mod lists {
             let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let result0 = self.func_list_u64_ret.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
             let ptr3 = load1;
             let len3 = load2;
             Ok(copy_slice(
@@ -662,10 +680,10 @@ pub mod lists {
             let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let result0 = self.func_list_s8_ret.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
             let ptr3 = load1;
             let len3 = load2;
             Ok(copy_slice(
@@ -684,10 +702,10 @@ pub mod lists {
             let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let result0 = self.func_list_s16_ret.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
             let ptr3 = load1;
             let len3 = load2;
             Ok(copy_slice(
@@ -706,10 +724,10 @@ pub mod lists {
             let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let result0 = self.func_list_s32_ret.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
             let ptr3 = load1;
             let len3 = load2;
             Ok(copy_slice(
@@ -728,10 +746,10 @@ pub mod lists {
             let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let result0 = self.func_list_s64_ret.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
             let ptr3 = load1;
             let len3 = load2;
             Ok(copy_slice(
@@ -750,10 +768,10 @@ pub mod lists {
             let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let result0 = self.func_list_float32_ret.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
             let ptr3 = load1;
             let len3 = load2;
             Ok(copy_slice(
@@ -772,10 +790,10 @@ pub mod lists {
             let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let result0 = self.func_list_float64_ret.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
             let ptr3 = load1;
             let len3 = load2;
             Ok(copy_slice(
@@ -792,8 +810,8 @@ pub mod lists {
             store: &mut wasmer::Store,
             x: &[(u8, i8)],
         ) -> Result<Vec<(i64, u32)>, wasmer::RuntimeError> {
-            let func_canonical_abi_realloc = &self.func_canonical_abi_realloc;
             let func_canonical_abi_free = &self.func_canonical_abi_free;
+            let func_canonical_abi_realloc = &self.func_canonical_abi_realloc;
             let _memory = &self.memory;
             let vec0 = x;
             let ptr0 = func_canonical_abi_realloc.call(
@@ -803,12 +821,13 @@ pub mod lists {
                 1,
                 (vec0.len() as i32) * 2,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store_many(ptr0, &vec0)?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr0, &vec0)?;
             let result1 = self.func_tuple_list.call(store, ptr0, vec0.len() as i32)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result1 + 0)?;
-            let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result1 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load3 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 4)?;
             let ptr4 = load2;
             let len4 = load3;
             Ok(copy_slice(
@@ -842,11 +861,14 @@ pub mod lists {
                         1,
                         vec0.len() as i32,
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store_many(ptr0, vec0.as_bytes())?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 4, wit_bindgen_wasmer::rt::as_i32(vec0.len() as i32))?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 0, wit_bindgen_wasmer::rt::as_i32(ptr0))?;
                 }
             }
@@ -860,20 +882,22 @@ pub mod lists {
             let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let result0 = self.func_string_list_ret.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
             let len6 = load2;
             let base6 = load1;
             let mut result6 = Vec::with_capacity(len6 as usize);
             for i in 0..len6 {
                 let base = base6 + i * 8;
                 result6.push({
-                    let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 0)?;
-                    let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load3 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 0)?;
+                    let _memory_view = _memory.view(&store);
+                    let load4 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 4)?;
                     let ptr5 = load3;
                     let len5 = load4;
 
@@ -901,7 +925,8 @@ pub mod lists {
                 let base = result2 + (i as i32) * 12;
                 {
                     let (t0_0, t0_1) = e;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 0,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(t0_0)) as u8,
                     )?;
@@ -913,35 +938,41 @@ pub mod lists {
                         1,
                         vec1.len() as i32,
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store_many(ptr1, vec1.as_bytes())?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 8, wit_bindgen_wasmer::rt::as_i32(vec1.len() as i32))?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 4, wit_bindgen_wasmer::rt::as_i32(ptr1))?;
                 }
             }
             let result3 = self.func_tuple_string_list.call(store, result2, len2)?;
-            let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result3 + 0)?;
-            let load5 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result3 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load4 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result3 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load5 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result3 + 4)?;
             let len10 = load5;
             let base10 = load4;
             let mut result10 = Vec::with_capacity(len10 as usize);
             for i in 0..len10 {
                 let base = base10 + i * 12;
                 result10.push({
-                    let load6 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 0)?;
-                    let load7 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load6 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 0)?;
+                    let _memory_view = _memory.view(&store);
+                    let load7 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 4)?;
                     let ptr8 = load6;
                     let len8 = load7;
 
                     let data8 = copy_slice(store, _memory, func_canonical_abi_free, ptr8, len8, 1)?;
-                    let load9 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<u8>(base + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load9 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(base + 8)?;
                     (
                         String::from_utf8(data8)
                             .map_err(|_| wasmer::RuntimeError::new("invalid utf-8"))?,
@@ -975,29 +1006,34 @@ pub mod lists {
                         1,
                         vec0.len() as i32,
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store_many(ptr0, vec0.as_bytes())?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 4, wit_bindgen_wasmer::rt::as_i32(vec0.len() as i32))?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 0, wit_bindgen_wasmer::rt::as_i32(ptr0))?;
                 }
             }
             let result2 = self.func_string_list.call(store, result1, len1)?;
-            let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result2 + 0)?;
-            let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result2 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load3 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result2 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load4 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result2 + 4)?;
             let len8 = load4;
             let base8 = load3;
             let mut result8 = Vec::with_capacity(len8 as usize);
             for i in 0..len8 {
                 let base = base8 + i * 8;
                 result8.push({
-                    let load5 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 0)?;
-                    let load6 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load5 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 0)?;
+                    let _memory_view = _memory.view(&store);
+                    let load6 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 4)?;
                     let ptr7 = load5;
                     let len7 = load6;
 
@@ -1041,11 +1077,14 @@ pub mod lists {
                         1,
                         vec1.len() as i32,
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store_many(ptr1, vec1.as_bytes())?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 4, wit_bindgen_wasmer::rt::as_i32(vec1.len() as i32))?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 0, wit_bindgen_wasmer::rt::as_i32(ptr1))?;
                     let OtherRecordParam {
                         a1: a12,
@@ -1055,19 +1094,23 @@ pub mod lists {
                         b: b2,
                         c: c2,
                     } = y0;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 8,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(a12)),
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 16,
                         wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a22)),
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 24,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(a32)),
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 32,
                         wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a42)),
                     )?;
@@ -1079,11 +1122,14 @@ pub mod lists {
                         1,
                         vec3.len() as i32,
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store_many(ptr3, vec3.as_bytes())?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 44, wit_bindgen_wasmer::rt::as_i32(vec3.len() as i32))?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 40, wit_bindgen_wasmer::rt::as_i32(ptr3))?;
                     let vec4 = c2;
                     let ptr4 = func_canonical_abi_realloc.call(
@@ -1093,11 +1139,13 @@ pub mod lists {
                         1,
                         (vec4.len() as i32) * 1,
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .store_many(ptr4, &vec4)?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr4, &vec4)?;
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 52, wit_bindgen_wasmer::rt::as_i32(vec4.len() as i32))?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 48, wit_bindgen_wasmer::rt::as_i32(ptr4))?;
                     let vec8 = z0;
                     let len8 = vec8.len() as i32;
@@ -1119,19 +1167,23 @@ pub mod lists {
                                 b: b5,
                                 c: c5,
                             } = e;
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }.store(
                                 base + 0,
                                 wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(a15)),
                             )?;
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }.store(
                                 base + 8,
                                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a25)),
                             )?;
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }.store(
                                 base + 16,
                                 wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(a35)),
                             )?;
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }.store(
                                 base + 24,
                                 wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a45)),
                             )?;
@@ -1143,13 +1195,16 @@ pub mod lists {
                                 1,
                                 vec6.len() as i32,
                             )?;
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }
                                 .store_many(ptr6, vec6.as_bytes())?;
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }.store(
                                 base + 36,
                                 wit_bindgen_wasmer::rt::as_i32(vec6.len() as i32),
                             )?;
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }
                                 .store(base + 32, wit_bindgen_wasmer::rt::as_i32(ptr6))?;
                             let vec7 = c5;
                             let ptr7 = func_canonical_abi_realloc.call(
@@ -1159,70 +1214,86 @@ pub mod lists {
                                 1,
                                 (vec7.len() as i32) * 1,
                             )?;
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                                .store_many(ptr7, &vec7)?;
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr7, &vec7)?;
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }.store(
                                 base + 44,
                                 wit_bindgen_wasmer::rt::as_i32(vec7.len() as i32),
                             )?;
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }
                                 .store(base + 40, wit_bindgen_wasmer::rt::as_i32(ptr7))?;
                         }
                     }
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 60, wit_bindgen_wasmer::rt::as_i32(len8))?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 56, wit_bindgen_wasmer::rt::as_i32(result8))?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 64,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(c10)),
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 72,
                         wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(c20)),
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 80,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(c30)),
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 88,
                         wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(c40)),
                     )?;
                 }
             }
             let result10 = self.func_record_list.call(store, result9, len9)?;
-            let load11 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result10 + 0)?;
-            let load12 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result10 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load11 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result10 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load12 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result10 + 4)?;
             let len23 = load12;
             let base23 = load11;
             let mut result23 = Vec::with_capacity(len23 as usize);
             for i in 0..len23 {
                 let base = base23 + i * 48;
                 result23.push({
-                    let load13 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 0)?;
-                    let load14 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i64>(base + 8)?;
-                    let load15 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 16)?;
-                    let load16 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i64>(base + 24)?;
-                    let load17 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 32)?;
-                    let load18 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 36)?;
+                    let _memory_view = _memory.view(&store);
+                    let load13 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 0)?;
+                    let _memory_view = _memory.view(&store);
+                    let load14 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i64>(base + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load15 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 16)?;
+                    let _memory_view = _memory.view(&store);
+                    let load16 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i64>(base + 24)?;
+                    let _memory_view = _memory.view(&store);
+                    let load17 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 32)?;
+                    let _memory_view = _memory.view(&store);
+                    let load18 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 36)?;
                     let ptr19 = load17;
                     let len19 = load18;
 
                     let data19 =
                         copy_slice(store, _memory, func_canonical_abi_free, ptr19, len19, 1)?;
-                    let load20 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 40)?;
-                    let load21 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 44)?;
+                    let _memory_view = _memory.view(&store);
+                    let load20 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 40)?;
+                    let _memory_view = _memory.view(&store);
+                    let load21 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 44)?;
                     let ptr22 = load20;
                     let len22 = load21;
                     OtherRecordResult {
@@ -1262,19 +1333,23 @@ pub mod lists {
                         b: b0,
                         c: c0,
                     } = e;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 0,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(a10)),
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 8,
                         wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a20)),
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 16,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(a30)),
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 24,
                         wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(a40)),
                     )?;
@@ -1286,11 +1361,14 @@ pub mod lists {
                         1,
                         vec1.len() as i32,
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store_many(ptr1, vec1.as_bytes())?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 36, wit_bindgen_wasmer::rt::as_i32(vec1.len() as i32))?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 32, wit_bindgen_wasmer::rt::as_i32(ptr1))?;
                     let vec2 = c0;
                     let ptr2 = func_canonical_abi_realloc.call(
@@ -1300,84 +1378,98 @@ pub mod lists {
                         1,
                         (vec2.len() as i32) * 1,
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .store_many(ptr2, &vec2)?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr2, &vec2)?;
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 44, wit_bindgen_wasmer::rt::as_i32(vec2.len() as i32))?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 40, wit_bindgen_wasmer::rt::as_i32(ptr2))?;
                 }
             }
             let result4 = self.func_record_list_reverse.call(store, result3, len3)?;
-            let load5 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result4 + 0)?;
-            let load6 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result4 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load5 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result4 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load6 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result4 + 4)?;
             let len37 = load6;
             let base37 = load5;
             let mut result37 = Vec::with_capacity(len37 as usize);
             for i in 0..len37 {
                 let base = base37 + i * 96;
                 result37.push({
-                    let load7 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 0)?;
-                    let load8 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load7 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 0)?;
+                    let _memory_view = _memory.view(&store);
+                    let load8 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 4)?;
                     let ptr9 = load7;
                     let len9 = load8;
 
                     let data9 = copy_slice(store, _memory, func_canonical_abi_free, ptr9, len9, 1)?;
-                    let load10 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 8)?;
-                    let load11 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i64>(base + 16)?;
-                    let load12 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 24)?;
-                    let load13 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i64>(base + 32)?;
-                    let load14 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 40)?;
-                    let load15 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 44)?;
+                    let _memory_view = _memory.view(&store);
+                    let load10 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load11 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i64>(base + 16)?;
+                    let _memory_view = _memory.view(&store);
+                    let load12 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 24)?;
+                    let _memory_view = _memory.view(&store);
+                    let load13 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i64>(base + 32)?;
+                    let _memory_view = _memory.view(&store);
+                    let load14 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 40)?;
+                    let _memory_view = _memory.view(&store);
+                    let load15 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 44)?;
                     let ptr16 = load14;
                     let len16 = load15;
 
                     let data16 =
                         copy_slice(store, _memory, func_canonical_abi_free, ptr16, len16, 1)?;
-                    let load17 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 48)?;
-                    let load18 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 52)?;
+                    let _memory_view = _memory.view(&store);
+                    let load17 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 48)?;
+                    let _memory_view = _memory.view(&store);
+                    let load18 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 52)?;
                     let ptr19 = load17;
                     let len19 = load18;
-                    let load20 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 56)?;
-                    let load21 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 60)?;
+                    let _memory_view = _memory.view(&store);
+                    let load20 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 56)?;
+                    let _memory_view = _memory.view(&store);
+                    let load21 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 60)?;
                     let len32 = load21;
                     let base32 = load20;
                     let mut result32 = Vec::with_capacity(len32 as usize);
                     for i in 0..len32 {
                         let base = base32 + i * 48;
                         result32.push({
-                            let load22 =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                                    .load::<i32>(base + 0)?;
-                            let load23 =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                                    .load::<i64>(base + 8)?;
-                            let load24 =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                                    .load::<i32>(base + 16)?;
-                            let load25 =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                                    .load::<i64>(base + 24)?;
-                            let load26 =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                                    .load::<i32>(base + 32)?;
-                            let load27 =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                                    .load::<i32>(base + 36)?;
+                            let _memory_view = _memory.view(&store);
+                            let load22 = unsafe { _memory_view.data_unchecked_mut() }
+                                .load::<i32>(base + 0)?;
+                            let _memory_view = _memory.view(&store);
+                            let load23 = unsafe { _memory_view.data_unchecked_mut() }
+                                .load::<i64>(base + 8)?;
+                            let _memory_view = _memory.view(&store);
+                            let load24 = unsafe { _memory_view.data_unchecked_mut() }
+                                .load::<i32>(base + 16)?;
+                            let _memory_view = _memory.view(&store);
+                            let load25 = unsafe { _memory_view.data_unchecked_mut() }
+                                .load::<i64>(base + 24)?;
+                            let _memory_view = _memory.view(&store);
+                            let load26 = unsafe { _memory_view.data_unchecked_mut() }
+                                .load::<i32>(base + 32)?;
+                            let _memory_view = _memory.view(&store);
+                            let load27 = unsafe { _memory_view.data_unchecked_mut() }
+                                .load::<i32>(base + 36)?;
                             let ptr28 = load26;
                             let len28 = load27;
 
@@ -1389,12 +1481,12 @@ pub mod lists {
                                 len28,
                                 1,
                             )?;
-                            let load29 =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                                    .load::<i32>(base + 40)?;
-                            let load30 =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                                    .load::<i32>(base + 44)?;
+                            let _memory_view = _memory.view(&store);
+                            let load29 = unsafe { _memory_view.data_unchecked_mut() }
+                                .load::<i32>(base + 40)?;
+                            let _memory_view = _memory.view(&store);
+                            let load30 = unsafe { _memory_view.data_unchecked_mut() }
+                                .load::<i32>(base + 44)?;
                             let ptr31 = load29;
                             let len31 = load30;
                             OtherRecordResult {
@@ -1421,14 +1513,18 @@ pub mod lists {
                         len32 * 48,
                         8,
                     )?;
-                    let load33 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 64)?;
-                    let load34 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i64>(base + 72)?;
-                    let load35 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 80)?;
-                    let load36 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i64>(base + 88)?;
+                    let _memory_view = _memory.view(&store);
+                    let load33 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 64)?;
+                    let _memory_view = _memory.view(&store);
+                    let load34 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i64>(base + 72)?;
+                    let _memory_view = _memory.view(&store);
+                    let load35 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 80)?;
+                    let _memory_view = _memory.view(&store);
+                    let load36 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i64>(base + 88)?;
                     SomeRecordResult {
                         x: String::from_utf8(data9)
                             .map_err(|_| wasmer::RuntimeError::new("invalid utf-8"))?,
@@ -1476,7 +1572,8 @@ pub mod lists {
                 {
                     match e {
                         SomeVariant::A(e) => {
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }
                                 .store(base + 0, wit_bindgen_wasmer::rt::as_i32(0i32) as u8)?;
                             let vec0 = e;
                             let ptr0 = func_canonical_abi_realloc.call(
@@ -1486,33 +1583,40 @@ pub mod lists {
                                 1,
                                 vec0.len() as i32,
                             )?;
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }
                                 .store_many(ptr0, vec0.as_bytes())?;
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }.store(
                                 base + 8,
                                 wit_bindgen_wasmer::rt::as_i32(vec0.len() as i32),
                             )?;
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }
                                 .store(base + 4, wit_bindgen_wasmer::rt::as_i32(ptr0))?;
                         }
                         SomeVariant::B => {
                             let e = ();
                             {
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                                let _memory_view = _memory.view(&store);
+                                unsafe { _memory_view.data_unchecked_mut() }
                                     .store(base + 0, wit_bindgen_wasmer::rt::as_i32(1i32) as u8)?;
                                 let () = e;
                             }
                         }
                         SomeVariant::C(e) => {
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }
                                 .store(base + 0, wit_bindgen_wasmer::rt::as_i32(2i32) as u8)?;
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }.store(
                                 base + 4,
                                 wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(e)),
                             )?;
                         }
                         SomeVariant::D(e) => {
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }
                                 .store(base + 0, wit_bindgen_wasmer::rt::as_i32(3i32) as u8)?;
                             let vec2 = e;
                             let len2 = vec2.len() as i32;
@@ -1530,29 +1634,23 @@ pub mod lists {
                                         OtherVariantParam::A => {
                                             let e = ();
                                             {
-                                                unsafe {
-                                                    _memory
-                                                        .data_unchecked_mut(&store.as_store_ref())
-                                                }
-                                                .store(
-                                                    base + 0,
-                                                    wit_bindgen_wasmer::rt::as_i32(0i32) as u8,
-                                                )?;
+                                                let _memory_view = _memory.view(&store);
+                                                unsafe { _memory_view.data_unchecked_mut() }
+                                                    .store(
+                                                        base + 0,
+                                                        wit_bindgen_wasmer::rt::as_i32(0i32) as u8,
+                                                    )?;
                                                 let () = e;
                                             }
                                         }
                                         OtherVariantParam::B(e) => {
-                                            unsafe {
-                                                _memory.data_unchecked_mut(&store.as_store_ref())
-                                            }
-                                            .store(
+                                            let _memory_view = _memory.view(&store);
+                                            unsafe { _memory_view.data_unchecked_mut() }.store(
                                                 base + 0,
                                                 wit_bindgen_wasmer::rt::as_i32(1i32) as u8,
                                             )?;
-                                            unsafe {
-                                                _memory.data_unchecked_mut(&store.as_store_ref())
-                                            }
-                                            .store(
+                                            let _memory_view = _memory.view(&store);
+                                            unsafe { _memory_view.data_unchecked_mut() }.store(
                                                 base + 4,
                                                 wit_bindgen_wasmer::rt::as_i32(
                                                     wit_bindgen_wasmer::rt::as_i32(e),
@@ -1560,10 +1658,8 @@ pub mod lists {
                                             )?;
                                         }
                                         OtherVariantParam::C(e) => {
-                                            unsafe {
-                                                _memory.data_unchecked_mut(&store.as_store_ref())
-                                            }
-                                            .store(
+                                            let _memory_view = _memory.view(&store);
+                                            unsafe { _memory_view.data_unchecked_mut() }.store(
                                                 base + 0,
                                                 wit_bindgen_wasmer::rt::as_i32(2i32) as u8,
                                             )?;
@@ -1575,21 +1671,16 @@ pub mod lists {
                                                 1,
                                                 vec1.len() as i32,
                                             )?;
-                                            unsafe {
-                                                _memory.data_unchecked_mut(&store.as_store_ref())
-                                            }
-                                            .store_many(ptr1, vec1.as_bytes())?;
-                                            unsafe {
-                                                _memory.data_unchecked_mut(&store.as_store_ref())
-                                            }
-                                            .store(
+                                            let _memory_view = _memory.view(&store);
+                                            unsafe { _memory_view.data_unchecked_mut() }
+                                                .store_many(ptr1, vec1.as_bytes())?;
+                                            let _memory_view = _memory.view(&store);
+                                            unsafe { _memory_view.data_unchecked_mut() }.store(
                                                 base + 8,
                                                 wit_bindgen_wasmer::rt::as_i32(vec1.len() as i32),
                                             )?;
-                                            unsafe {
-                                                _memory.data_unchecked_mut(&store.as_store_ref())
-                                            }
-                                            .store(
+                                            let _memory_view = _memory.view(&store);
+                                            unsafe { _memory_view.data_unchecked_mut() }.store(
                                                 base + 4,
                                                 wit_bindgen_wasmer::rt::as_i32(ptr1),
                                             )?;
@@ -1597,42 +1688,45 @@ pub mod lists {
                                     };
                                 }
                             }
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }
                                 .store(base + 8, wit_bindgen_wasmer::rt::as_i32(len2))?;
-                            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                            let _memory_view = _memory.view(&store);
+                            unsafe { _memory_view.data_unchecked_mut() }
                                 .store(base + 4, wit_bindgen_wasmer::rt::as_i32(result2))?;
                         }
                     };
                 }
             }
             let result4 = self.func_variant_list.call(store, result3, len3)?;
-            let load5 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result4 + 0)?;
-            let load6 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result4 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load5 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result4 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load6 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result4 + 4)?;
             let len12 = load6;
             let base12 = load5;
             let mut result12 = Vec::with_capacity(len12 as usize);
             for i in 0..len12 {
                 let base = base12 + i * 12;
                 result12.push({
-                    let load7 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<u8>(base + 0)?;
+                    let _memory_view = _memory.view(&store);
+                    let load7 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(base + 0)?;
                     match i32::from(load7) {
                         0 => OtherVariantResult::A,
                         1 => OtherVariantResult::B({
-                            let load8 =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                                    .load::<i32>(base + 4)?;
+                            let _memory_view = _memory.view(&store);
+                            let load8 = unsafe { _memory_view.data_unchecked_mut() }
+                                .load::<i32>(base + 4)?;
                             load8 as u32
                         }),
                         2 => OtherVariantResult::C({
-                            let load9 =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                                    .load::<i32>(base + 4)?;
-                            let load10 =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                                    .load::<i32>(base + 8)?;
+                            let _memory_view = _memory.view(&store);
+                            let load9 = unsafe { _memory_view.data_unchecked_mut() }
+                                .load::<i32>(base + 4)?;
+                            let _memory_view = _memory.view(&store);
+                            let load10 = unsafe { _memory_view.data_unchecked_mut() }
+                                .load::<i32>(base + 8)?;
                             let ptr11 = load9;
                             let len11 = load10;
 
@@ -1659,8 +1753,8 @@ pub mod lists {
             store: &mut wasmer::Store,
             a: LoadStoreAllSizesParam<'_>,
         ) -> Result<LoadStoreAllSizesResult, wasmer::RuntimeError> {
-            let func_canonical_abi_free = &self.func_canonical_abi_free;
             let func_canonical_abi_realloc = &self.func_canonical_abi_realloc;
+            let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let vec2 = a;
             let len2 = vec2.len() as i32;
@@ -1679,95 +1773,122 @@ pub mod lists {
                         1,
                         vec1.len() as i32,
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store_many(ptr1, vec1.as_bytes())?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 4, wit_bindgen_wasmer::rt::as_i32(vec1.len() as i32))?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 0, wit_bindgen_wasmer::rt::as_i32(ptr1))?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 8,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(t0_1)) as u8,
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 9,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(t0_2)) as u8,
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 10,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(t0_3)) as u16,
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 12,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(t0_4)) as u16,
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 16,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(t0_5)),
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 20,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(t0_6)),
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 24,
                         wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(t0_7)),
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 32,
                         wit_bindgen_wasmer::rt::as_i64(wit_bindgen_wasmer::rt::as_i64(t0_8)),
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 40, wit_bindgen_wasmer::rt::as_f32(t0_9))?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 48, wit_bindgen_wasmer::rt::as_f64(t0_10))?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store(
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store(
                         base + 56,
                         wit_bindgen_wasmer::rt::as_i32(wit_bindgen_wasmer::rt::as_i32(t0_11)),
                     )?;
                 }
             }
             let result3 = self.func_load_store_everything.call(store, result2, len2)?;
-            let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result3 + 0)?;
-            let load5 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result3 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load4 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result3 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load5 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result3 + 4)?;
             let len20 = load5;
             let base20 = load4;
             let mut result20 = Vec::with_capacity(len20 as usize);
             for i in 0..len20 {
                 let base = base20 + i * 64;
                 result20.push({
-                    let load6 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 0)?;
-                    let load7 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load6 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 0)?;
+                    let _memory_view = _memory.view(&store);
+                    let load7 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 4)?;
                     let ptr8 = load6;
                     let len8 = load7;
 
                     let data8 = copy_slice(store, _memory, func_canonical_abi_free, ptr8, len8, 1)?;
-                    let load9 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<u8>(base + 8)?;
-                    let load10 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i8>(base + 9)?;
-                    let load11 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<u16>(base + 10)?;
-                    let load12 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i16>(base + 12)?;
-                    let load13 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 16)?;
-                    let load14 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 20)?;
-                    let load15 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i64>(base + 24)?;
-                    let load16 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i64>(base + 32)?;
-                    let load17 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<f32>(base + 40)?;
-                    let load18 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<f64>(base + 48)?;
-                    let load19 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 56)?;
+                    let _memory_view = _memory.view(&store);
+                    let load9 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(base + 8)?;
+                    let _memory_view = _memory.view(&store);
+                    let load10 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i8>(base + 9)?;
+                    let _memory_view = _memory.view(&store);
+                    let load11 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<u16>(base + 10)?;
+                    let _memory_view = _memory.view(&store);
+                    let load12 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i16>(base + 12)?;
+                    let _memory_view = _memory.view(&store);
+                    let load13 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 16)?;
+                    let _memory_view = _memory.view(&store);
+                    let load14 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 20)?;
+                    let _memory_view = _memory.view(&store);
+                    let load15 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i64>(base + 24)?;
+                    let _memory_view = _memory.view(&store);
+                    let load16 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i64>(base + 32)?;
+                    let _memory_view = _memory.view(&store);
+                    let load17 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<f32>(base + 40)?;
+                    let _memory_view = _memory.view(&store);
+                    let load18 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<f64>(base + 48)?;
+                    let _memory_view = _memory.view(&store);
+                    let load19 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 56)?;
                     (
                         String::from_utf8(data8)
                             .map_err(|_| wasmer::RuntimeError::new("invalid utf-8"))?,

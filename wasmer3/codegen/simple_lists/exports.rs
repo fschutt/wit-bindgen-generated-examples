@@ -41,7 +41,7 @@ pub mod simple_lists {
         let mut store = store.as_store_mut();
         exports.insert(
             "simple-list1",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -49,8 +49,9 @@ pub mod simple_lists {
                       arg1: i32|
                       -> Result<(), wasmer::RuntimeError> {
                     let _memory: wasmer::Memory = store.data().lazy.get().unwrap().memory.clone();
+                    let _memory_view = _memory.view(&store);
                     let mut _bc = wit_bindgen_wasmer::BorrowChecker::new(unsafe {
-                        _memory.data_unchecked_mut(&store)
+                        _memory_view.data_unchecked_mut()
                     });
                     let data_mut = store.data_mut();
                     let ptr0 = arg0;
@@ -65,7 +66,7 @@ pub mod simple_lists {
         );
         exports.insert(
             "simple-list2",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -90,8 +91,8 @@ pub mod simple_lists {
                         4,
                         (vec0.len() as i32) * 4,
                     )?;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store_many(ptr0, &vec0)?;
                     caller_memory
                         .store(arg0 + 4, wit_bindgen_wasmer::rt::as_i32(vec0.len() as i32))?;
@@ -102,7 +103,7 @@ pub mod simple_lists {
         );
         exports.insert(
             "simple-list4",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -118,8 +119,9 @@ pub mod simple_lists {
                         .func_canonical_abi_realloc
                         .clone();
                     let _memory: wasmer::Memory = store.data().lazy.get().unwrap().memory.clone();
+                    let _memory_view = _memory.view(&store);
                     let mut _bc = wit_bindgen_wasmer::BorrowChecker::new(unsafe {
-                        _memory.data_unchecked_mut(&store)
+                        _memory_view.data_unchecked_mut()
                     });
                     let data_mut = store.data_mut();
                     let len3 = arg1;
@@ -158,8 +160,8 @@ pub mod simple_lists {
                                 4,
                                 (vec4.len() as i32) * 4,
                             )?;
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory.store_many(ptr4, &vec4)?;
                             caller_memory.store(
                                 base + 4,
@@ -168,8 +170,8 @@ pub mod simple_lists {
                             caller_memory.store(base + 0, wit_bindgen_wasmer::rt::as_i32(ptr4))?;
                         }
                     }
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store(arg2 + 4, wit_bindgen_wasmer::rt::as_i32(len5))?;
                     caller_memory.store(arg2 + 0, wit_bindgen_wasmer::rt::as_i32(result5))?;
                     Ok(())

@@ -26,10 +26,10 @@ pub mod simple_lists {
         /// This function returns the `SimpleListsData` which needs to be
         /// passed through to `SimpleLists::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<SimpleListsData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, SimpleListsData::default());
             env
         }
 
@@ -44,12 +44,12 @@ pub mod simple_lists {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
 
             Ok((Self::new(store, &instance, env)?, instance))
         }
@@ -62,25 +62,25 @@ pub mod simple_lists {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<SimpleListsData>,
         ) -> Result<Self, wasmer::ExportError> {
             let func_canonical_abi_free = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_free")?;
+                .get_typed_function(&store, "canonical_abi_free")?;
             let func_canonical_abi_realloc = _instance
                 .exports
-                .get_typed_function(store, "canonical_abi_realloc")?;
+                .get_typed_function(&store, "canonical_abi_realloc")?;
             let func_simple_list1 = _instance
                 .exports
-                .get_typed_function(store, "simple-list1")?;
+                .get_typed_function(&store, "simple-list1")?;
             let func_simple_list2 = _instance
                 .exports
-                .get_typed_function(store, "simple-list2")?;
+                .get_typed_function(&store, "simple-list2")?;
             let func_simple_list4 = _instance
                 .exports
-                .get_typed_function(store, "simple-list4")?;
+                .get_typed_function(&store, "simple-list4")?;
             let memory = _instance.exports.get_memory("memory")?.clone();
             Ok(SimpleLists {
                 func_canonical_abi_free,
@@ -107,7 +107,8 @@ pub mod simple_lists {
                 4,
                 (vec0.len() as i32) * 4,
             )?;
-            unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }.store_many(ptr0, &vec0)?;
+            let _memory_view = _memory.view(&store);
+            unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr0, &vec0)?;
             self.func_simple_list1
                 .call(store, ptr0, vec0.len() as i32)?;
             Ok(())
@@ -119,10 +120,10 @@ pub mod simple_lists {
             let func_canonical_abi_free = &self.func_canonical_abi_free;
             let _memory = &self.memory;
             let result0 = self.func_simple_list2.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result0 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result0 + 4)?;
             let ptr3 = load1;
             let len3 = load2;
             Ok(copy_slice(
@@ -139,8 +140,8 @@ pub mod simple_lists {
             store: &mut wasmer::Store,
             l: &[&[u32]],
         ) -> Result<Vec<Vec<u32>>, wasmer::RuntimeError> {
-            let func_canonical_abi_realloc = &self.func_canonical_abi_realloc;
             let func_canonical_abi_free = &self.func_canonical_abi_free;
+            let func_canonical_abi_realloc = &self.func_canonical_abi_realloc;
             let _memory = &self.memory;
             let vec1 = l;
             let len1 = vec1.len() as i32;
@@ -157,29 +158,33 @@ pub mod simple_lists {
                         4,
                         (vec0.len() as i32) * 4,
                     )?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .store_many(ptr0, &vec0)?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }.store_many(ptr0, &vec0)?;
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 4, wit_bindgen_wasmer::rt::as_i32(vec0.len() as i32))?;
-                    unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
+                    let _memory_view = _memory.view(&store);
+                    unsafe { _memory_view.data_unchecked_mut() }
                         .store(base + 0, wit_bindgen_wasmer::rt::as_i32(ptr0))?;
                 }
             }
             let result2 = self.func_simple_list4.call(store, result1, len1)?;
-            let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result2 + 0)?;
-            let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result2 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load3 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result2 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load4 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result2 + 4)?;
             let len8 = load4;
             let base8 = load3;
             let mut result8 = Vec::with_capacity(len8 as usize);
             for i in 0..len8 {
                 let base = base8 + i * 8;
                 result8.push({
-                    let load5 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 0)?;
-                    let load6 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                        .load::<i32>(base + 4)?;
+                    let _memory_view = _memory.view(&store);
+                    let load5 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 0)?;
+                    let _memory_view = _memory.view(&store);
+                    let load6 =
+                        unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(base + 4)?;
                     let ptr7 = load5;
                     let len7 = load6;
 

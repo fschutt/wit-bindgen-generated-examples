@@ -28,7 +28,7 @@ pub mod smoke {
         let mut store = store.as_store_mut();
         exports.insert(
     "y",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {

@@ -16,4 +16,4 @@ branch = "master"
 
 [dependencies.wit-bindgen-wasmer]
 git = "https://github.com/wasmerio/wit-bindgen"
-branch = "silwol/wasmer3"
+branch = "wasmer"

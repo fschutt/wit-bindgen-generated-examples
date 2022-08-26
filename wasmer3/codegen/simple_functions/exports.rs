@@ -34,7 +34,7 @@ pub mod simple_functions {
         let mut store = store.as_store_mut();
         exports.insert(
     "f1",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<(), wasmer::RuntimeError> {
@@ -47,7 +47,7 @@ pub mod simple_functions {
     ));
         exports.insert(
             "f2",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -64,7 +64,7 @@ pub mod simple_functions {
         );
         exports.insert(
             "f3",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -83,7 +83,7 @@ pub mod simple_functions {
         );
         exports.insert(
     "f4",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<i32, wasmer::RuntimeError> {

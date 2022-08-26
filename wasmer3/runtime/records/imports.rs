@@ -259,10 +259,10 @@ pub mod exports {
         /// This function returns the `ExportsData` which needs to be
         /// passed through to `Exports::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<ExportsData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, ExportsData::default());
             env
         }
 
@@ -277,12 +277,12 @@ pub mod exports {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
 
             Ok((Self::new(store, &instance, env)?, instance))
         }
@@ -295,31 +295,31 @@ pub mod exports {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<ExportsData>,
         ) -> Result<Self, wasmer::ExportError> {
             let func_multiple_results = _instance
                 .exports
-                .get_typed_function(store, "multiple-results")?;
+                .get_typed_function(&store, "multiple-results")?;
             let func_roundtrip_flags1 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-flags1")?;
+                .get_typed_function(&store, "roundtrip-flags1")?;
             let func_roundtrip_flags2 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-flags2")?;
+                .get_typed_function(&store, "roundtrip-flags2")?;
             let func_roundtrip_flags3 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-flags3")?;
+                .get_typed_function(&store, "roundtrip-flags3")?;
             let func_roundtrip_record1 = _instance
                 .exports
-                .get_typed_function(store, "roundtrip-record1")?;
-            let func_swap_tuple = _instance.exports.get_typed_function(store, "swap-tuple")?;
+                .get_typed_function(&store, "roundtrip-record1")?;
+            let func_swap_tuple = _instance.exports.get_typed_function(&store, "swap-tuple")?;
             let func_test_imports = _instance
                 .exports
-                .get_typed_function(store, "test-imports")?;
-            let func_tuple0 = _instance.exports.get_typed_function(store, "tuple0")?;
-            let func_tuple1 = _instance.exports.get_typed_function(store, "tuple1")?;
+                .get_typed_function(&store, "test-imports")?;
+            let func_tuple0 = _instance.exports.get_typed_function(&store, "tuple0")?;
+            let func_tuple1 = _instance.exports.get_typed_function(&store, "tuple1")?;
             let memory = _instance.exports.get_memory("memory")?.clone();
             Ok(Exports {
                 func_multiple_results,
@@ -345,10 +345,10 @@ pub mod exports {
         ) -> Result<(u8, u16), wasmer::RuntimeError> {
             let _memory = &self.memory;
             let result0 = self.func_multiple_results.call(store)?;
-            let load1 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result0 + 0)?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u16>(result0 + 2)?;
+            let _memory_view = _memory.view(&store);
+            let load1 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result0 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<u16>(result0 + 2)?;
             Ok((
                 u8::try_from(i32::from(load1)).map_err(bad_int)?,
                 u16::try_from(i32::from(load2)).map_err(bad_int)?,
@@ -366,10 +366,10 @@ pub mod exports {
                 wit_bindgen_wasmer::rt::as_i32(t0_0),
                 wit_bindgen_wasmer::rt::as_i32(t0_1),
             )?;
-            let load2 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result1 + 0)?;
-            let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result1 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load2 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result1 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load3 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result1 + 4)?;
             Ok((
                 load2 as u32,
                 u8::try_from(i32::from(load3)).map_err(bad_int)?,
@@ -428,16 +428,16 @@ pub mod exports {
                 (flags3.bits >> 0) as i32,
                 (flags3.bits >> 32) as i32,
             )?;
-            let load5 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result4 + 0)?;
-            let load6 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u16>(result4 + 2)?;
-            let load7 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result4 + 4)?;
-            let load8 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result4 + 8)?;
-            let load9 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<i32>(result4 + 12)?;
+            let _memory_view = _memory.view(&store);
+            let load5 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result4 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load6 = unsafe { _memory_view.data_unchecked_mut() }.load::<u16>(result4 + 2)?;
+            let _memory_view = _memory.view(&store);
+            let load7 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result4 + 4)?;
+            let _memory_view = _memory.view(&store);
+            let load8 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result4 + 8)?;
+            let _memory_view = _memory.view(&store);
+            let load9 = unsafe { _memory_view.data_unchecked_mut() }.load::<i32>(result4 + 12)?;
             Ok((
                 validate_flags(
                     0 | ((i32::from(load5) as u8) << 0),
@@ -478,10 +478,10 @@ pub mod exports {
                 wit_bindgen_wasmer::rt::as_i32(a0),
                 (flags1.bits >> 0) as i32,
             )?;
-            let load3 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result2 + 0)?;
-            let load4 = unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) }
-                .load::<u8>(result2 + 1)?;
+            let _memory_view = _memory.view(&store);
+            let load3 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result2 + 0)?;
+            let _memory_view = _memory.view(&store);
+            let load4 = unsafe { _memory_view.data_unchecked_mut() }.load::<u8>(result2 + 1)?;
             Ok(R1 {
                 a: u8::try_from(i32::from(load3)).map_err(bad_int)?,
                 b: validate_flags(

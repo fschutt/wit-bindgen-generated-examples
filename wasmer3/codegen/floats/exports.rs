@@ -34,7 +34,7 @@ pub mod floats {
         let mut store = store.as_store_mut();
         exports.insert(
             "float32-param",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -51,7 +51,7 @@ pub mod floats {
         );
         exports.insert(
             "float64-param",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -68,7 +68,7 @@ pub mod floats {
         );
         exports.insert(
     "float32-result",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<f32, wasmer::RuntimeError> {
@@ -80,7 +80,7 @@ pub mod floats {
     ));
         exports.insert(
     "float64-result",
-    wasmer::Function::new_native(
+    wasmer::Function::new_typed_with_env(
     &mut store,
     &env,
     move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<f64, wasmer::RuntimeError> {

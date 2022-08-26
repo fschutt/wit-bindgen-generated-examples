@@ -76,7 +76,7 @@ pub mod resource {
         let mut store = store.as_store_mut();
         exports.insert(
         "acquire-an-x",
-        wasmer::Function::new_native(
+        wasmer::Function::new_typed_with_env(
         &mut store,
         &env,
         move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<i32, wasmer::RuntimeError> {
@@ -94,7 +94,7 @@ pub mod resource {
         ));
         exports.insert(
             "receive-an-x",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -116,7 +116,7 @@ pub mod resource {
         );
         exports.insert(
         "y::some-constructor",
-        wasmer::Function::new_native(
+        wasmer::Function::new_typed_with_env(
         &mut store,
         &env,
         move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>| -> Result<i32, wasmer::RuntimeError> {
@@ -134,7 +134,7 @@ pub mod resource {
         ));
         exports.insert(
             "y::method-on-y",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -156,7 +156,7 @@ pub mod resource {
         );
         exports.insert(
             "y::method-with-param",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -180,7 +180,7 @@ pub mod resource {
         );
         exports.insert(
             "y::method-with-result",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -212,8 +212,8 @@ pub mod resource {
                         1,
                         vec0.len() as i32,
                     )?;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store_many(ptr0, vec0.as_bytes())?;
                     caller_memory
                         .store(arg1 + 4, wit_bindgen_wasmer::rt::as_i32(vec0.len() as i32))?;
@@ -228,7 +228,7 @@ pub mod resource {
             .unwrap_or_else(wasmer::Exports::new);
         canonical_abi.insert(
             "resource_drop_x",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -247,7 +247,7 @@ pub mod resource {
         );
         canonical_abi.insert(
             "resource_drop_y",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,

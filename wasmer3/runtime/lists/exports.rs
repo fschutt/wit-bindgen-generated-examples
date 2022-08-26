@@ -236,7 +236,7 @@ pub mod imports {
         let mut store = store.as_store_mut();
         exports.insert(
             "list-param",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -244,8 +244,9 @@ pub mod imports {
                       arg1: i32|
                       -> Result<(), wasmer::RuntimeError> {
                     let _memory: wasmer::Memory = store.data().lazy.get().unwrap().memory.clone();
+                    let _memory_view = _memory.view(&store);
                     let mut _bc = wit_bindgen_wasmer::BorrowChecker::new(unsafe {
-                        _memory.data_unchecked_mut(&store)
+                        _memory_view.data_unchecked_mut()
                     });
                     let data_mut = store.data_mut();
                     let ptr0 = arg0;
@@ -260,7 +261,7 @@ pub mod imports {
         );
         exports.insert(
             "list-param2",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -268,8 +269,9 @@ pub mod imports {
                       arg1: i32|
                       -> Result<(), wasmer::RuntimeError> {
                     let _memory: wasmer::Memory = store.data().lazy.get().unwrap().memory.clone();
+                    let _memory_view = _memory.view(&store);
                     let mut _bc = wit_bindgen_wasmer::BorrowChecker::new(unsafe {
-                        _memory.data_unchecked_mut(&store)
+                        _memory_view.data_unchecked_mut()
                     });
                     let data_mut = store.data_mut();
                     let ptr0 = arg0;
@@ -284,7 +286,7 @@ pub mod imports {
         );
         exports.insert(
             "list-param3",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -292,8 +294,9 @@ pub mod imports {
                       arg1: i32|
                       -> Result<(), wasmer::RuntimeError> {
                     let _memory: wasmer::Memory = store.data().lazy.get().unwrap().memory.clone();
+                    let _memory_view = _memory.view(&store);
                     let mut _bc = wit_bindgen_wasmer::BorrowChecker::new(unsafe {
-                        _memory.data_unchecked_mut(&store)
+                        _memory_view.data_unchecked_mut()
                     });
                     let data_mut = store.data_mut();
                     let len3 = arg1;
@@ -319,7 +322,7 @@ pub mod imports {
         );
         exports.insert(
             "list-param4",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -327,8 +330,9 @@ pub mod imports {
                       arg1: i32|
                       -> Result<(), wasmer::RuntimeError> {
                     let _memory: wasmer::Memory = store.data().lazy.get().unwrap().memory.clone();
+                    let _memory_view = _memory.view(&store);
                     let mut _bc = wit_bindgen_wasmer::BorrowChecker::new(unsafe {
-                        _memory.data_unchecked_mut(&store)
+                        _memory_view.data_unchecked_mut()
                     });
                     let data_mut = store.data_mut();
                     let len6 = arg1;
@@ -365,7 +369,7 @@ pub mod imports {
         );
         exports.insert(
             "list-result",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -390,8 +394,8 @@ pub mod imports {
                         1,
                         (vec0.len() as i32) * 1,
                     )?;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store_many(ptr0, &vec0)?;
                     caller_memory
                         .store(arg0 + 4, wit_bindgen_wasmer::rt::as_i32(vec0.len() as i32))?;
@@ -402,7 +406,7 @@ pub mod imports {
         );
         exports.insert(
             "list-result2",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -427,8 +431,8 @@ pub mod imports {
                         1,
                         vec0.len() as i32,
                     )?;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store_many(ptr0, vec0.as_bytes())?;
                     caller_memory
                         .store(arg0 + 4, wit_bindgen_wasmer::rt::as_i32(vec0.len() as i32))?;
@@ -439,7 +443,7 @@ pub mod imports {
         );
         exports.insert(
             "list-result3",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -476,8 +480,8 @@ pub mod imports {
                                 1,
                                 vec0.len() as i32,
                             )?;
-                            let caller_memory =
-                                unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                            let _memory_view = _memory.view(&store);
+                            let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                             caller_memory.store_many(ptr0, vec0.as_bytes())?;
                             caller_memory.store(
                                 base + 4,
@@ -486,8 +490,8 @@ pub mod imports {
                             caller_memory.store(base + 0, wit_bindgen_wasmer::rt::as_i32(ptr0))?;
                         }
                     }
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store(arg0 + 4, wit_bindgen_wasmer::rt::as_i32(len1))?;
                     caller_memory.store(arg0 + 0, wit_bindgen_wasmer::rt::as_i32(result1))?;
                     Ok(())
@@ -496,7 +500,7 @@ pub mod imports {
         );
         exports.insert(
             "list-minmax8",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -514,8 +518,9 @@ pub mod imports {
                         .func_canonical_abi_realloc
                         .clone();
                     let _memory: wasmer::Memory = store.data().lazy.get().unwrap().memory.clone();
+                    let _memory_view = _memory.view(&store);
                     let mut _bc = wit_bindgen_wasmer::BorrowChecker::new(unsafe {
-                        _memory.data_unchecked_mut(&store)
+                        _memory_view.data_unchecked_mut()
                     });
                     let data_mut = store.data_mut();
                     let ptr0 = arg0;
@@ -535,8 +540,8 @@ pub mod imports {
                         1,
                         (vec3.len() as i32) * 1,
                     )?;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store_many(ptr3, &vec3)?;
                     caller_memory
                         .store(arg4 + 4, wit_bindgen_wasmer::rt::as_i32(vec3.len() as i32))?;
@@ -549,8 +554,8 @@ pub mod imports {
                         1,
                         (vec4.len() as i32) * 1,
                     )?;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store_many(ptr4, &vec4)?;
                     caller_memory
                         .store(arg4 + 12, wit_bindgen_wasmer::rt::as_i32(vec4.len() as i32))?;
@@ -561,7 +566,7 @@ pub mod imports {
         );
         exports.insert(
             "list-minmax16",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -579,8 +584,9 @@ pub mod imports {
                         .func_canonical_abi_realloc
                         .clone();
                     let _memory: wasmer::Memory = store.data().lazy.get().unwrap().memory.clone();
+                    let _memory_view = _memory.view(&store);
                     let mut _bc = wit_bindgen_wasmer::BorrowChecker::new(unsafe {
-                        _memory.data_unchecked_mut(&store)
+                        _memory_view.data_unchecked_mut()
                     });
                     let data_mut = store.data_mut();
                     let ptr0 = arg0;
@@ -600,8 +606,8 @@ pub mod imports {
                         2,
                         (vec3.len() as i32) * 2,
                     )?;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store_many(ptr3, &vec3)?;
                     caller_memory
                         .store(arg4 + 4, wit_bindgen_wasmer::rt::as_i32(vec3.len() as i32))?;
@@ -614,8 +620,8 @@ pub mod imports {
                         2,
                         (vec4.len() as i32) * 2,
                     )?;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store_many(ptr4, &vec4)?;
                     caller_memory
                         .store(arg4 + 12, wit_bindgen_wasmer::rt::as_i32(vec4.len() as i32))?;
@@ -626,7 +632,7 @@ pub mod imports {
         );
         exports.insert(
             "list-minmax32",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -644,8 +650,9 @@ pub mod imports {
                         .func_canonical_abi_realloc
                         .clone();
                     let _memory: wasmer::Memory = store.data().lazy.get().unwrap().memory.clone();
+                    let _memory_view = _memory.view(&store);
                     let mut _bc = wit_bindgen_wasmer::BorrowChecker::new(unsafe {
-                        _memory.data_unchecked_mut(&store)
+                        _memory_view.data_unchecked_mut()
                     });
                     let data_mut = store.data_mut();
                     let ptr0 = arg0;
@@ -665,8 +672,8 @@ pub mod imports {
                         4,
                         (vec3.len() as i32) * 4,
                     )?;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store_many(ptr3, &vec3)?;
                     caller_memory
                         .store(arg4 + 4, wit_bindgen_wasmer::rt::as_i32(vec3.len() as i32))?;
@@ -679,8 +686,8 @@ pub mod imports {
                         4,
                         (vec4.len() as i32) * 4,
                     )?;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store_many(ptr4, &vec4)?;
                     caller_memory
                         .store(arg4 + 12, wit_bindgen_wasmer::rt::as_i32(vec4.len() as i32))?;
@@ -691,7 +698,7 @@ pub mod imports {
         );
         exports.insert(
             "list-minmax64",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -709,8 +716,9 @@ pub mod imports {
                         .func_canonical_abi_realloc
                         .clone();
                     let _memory: wasmer::Memory = store.data().lazy.get().unwrap().memory.clone();
+                    let _memory_view = _memory.view(&store);
                     let mut _bc = wit_bindgen_wasmer::BorrowChecker::new(unsafe {
-                        _memory.data_unchecked_mut(&store)
+                        _memory_view.data_unchecked_mut()
                     });
                     let data_mut = store.data_mut();
                     let ptr0 = arg0;
@@ -730,8 +738,8 @@ pub mod imports {
                         8,
                         (vec3.len() as i32) * 8,
                     )?;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store_many(ptr3, &vec3)?;
                     caller_memory
                         .store(arg4 + 4, wit_bindgen_wasmer::rt::as_i32(vec3.len() as i32))?;
@@ -744,8 +752,8 @@ pub mod imports {
                         8,
                         (vec4.len() as i32) * 8,
                     )?;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store_many(ptr4, &vec4)?;
                     caller_memory
                         .store(arg4 + 12, wit_bindgen_wasmer::rt::as_i32(vec4.len() as i32))?;
@@ -756,7 +764,7 @@ pub mod imports {
         );
         exports.insert(
             "list-minmax-float",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -774,8 +782,9 @@ pub mod imports {
                         .func_canonical_abi_realloc
                         .clone();
                     let _memory: wasmer::Memory = store.data().lazy.get().unwrap().memory.clone();
+                    let _memory_view = _memory.view(&store);
                     let mut _bc = wit_bindgen_wasmer::BorrowChecker::new(unsafe {
-                        _memory.data_unchecked_mut(&store)
+                        _memory_view.data_unchecked_mut()
                     });
                     let data_mut = store.data_mut();
                     let ptr0 = arg0;
@@ -795,8 +804,8 @@ pub mod imports {
                         4,
                         (vec3.len() as i32) * 4,
                     )?;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store_many(ptr3, &vec3)?;
                     caller_memory
                         .store(arg4 + 4, wit_bindgen_wasmer::rt::as_i32(vec3.len() as i32))?;
@@ -809,8 +818,8 @@ pub mod imports {
                         8,
                         (vec4.len() as i32) * 8,
                     )?;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store_many(ptr4, &vec4)?;
                     caller_memory
                         .store(arg4 + 12, wit_bindgen_wasmer::rt::as_i32(vec4.len() as i32))?;
@@ -821,7 +830,7 @@ pub mod imports {
         );
         exports.insert(
             "list-roundtrip",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -837,8 +846,9 @@ pub mod imports {
                         .func_canonical_abi_realloc
                         .clone();
                     let _memory: wasmer::Memory = store.data().lazy.get().unwrap().memory.clone();
+                    let _memory_view = _memory.view(&store);
                     let mut _bc = wit_bindgen_wasmer::BorrowChecker::new(unsafe {
-                        _memory.data_unchecked_mut(&store)
+                        _memory_view.data_unchecked_mut()
                     });
                     let data_mut = store.data_mut();
                     let ptr0 = arg0;
@@ -854,8 +864,8 @@ pub mod imports {
                         1,
                         (vec1.len() as i32) * 1,
                     )?;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store_many(ptr1, &vec1)?;
                     caller_memory
                         .store(arg2 + 4, wit_bindgen_wasmer::rt::as_i32(vec1.len() as i32))?;
@@ -866,7 +876,7 @@ pub mod imports {
         );
         exports.insert(
             "string-roundtrip",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -882,8 +892,9 @@ pub mod imports {
                         .func_canonical_abi_realloc
                         .clone();
                     let _memory: wasmer::Memory = store.data().lazy.get().unwrap().memory.clone();
+                    let _memory_view = _memory.view(&store);
                     let mut _bc = wit_bindgen_wasmer::BorrowChecker::new(unsafe {
-                        _memory.data_unchecked_mut(&store)
+                        _memory_view.data_unchecked_mut()
                     });
                     let data_mut = store.data_mut();
                     let ptr0 = arg0;
@@ -899,8 +910,8 @@ pub mod imports {
                         1,
                         vec1.len() as i32,
                     )?;
-                    let caller_memory =
-                        unsafe { _memory.data_unchecked_mut(&store.as_store_ref()) };
+                    let _memory_view = _memory.view(&store);
+                    let caller_memory = unsafe { _memory_view.data_unchecked_mut() };
                     caller_memory.store_many(ptr1, vec1.as_bytes())?;
                     caller_memory
                         .store(arg2 + 4, wit_bindgen_wasmer::rt::as_i32(vec1.len() as i32))?;
@@ -911,7 +922,7 @@ pub mod imports {
         );
         exports.insert(
             "unaligned-roundtrip1",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -927,8 +938,9 @@ pub mod imports {
                       arg9: i32|
                       -> Result<(), wasmer::RuntimeError> {
                     let _memory: wasmer::Memory = store.data().lazy.get().unwrap().memory.clone();
+                    let _memory_view = _memory.view(&store);
                     let mut _bc = wit_bindgen_wasmer::BorrowChecker::new(unsafe {
-                        _memory.data_unchecked_mut(&store)
+                        _memory_view.data_unchecked_mut()
                     });
                     let data_mut = store.data_mut();
                     let ptr0 = arg0;
@@ -982,7 +994,7 @@ pub mod imports {
         );
         exports.insert(
             "unaligned-roundtrip2",
-            wasmer::Function::new_native(
+            wasmer::Function::new_typed_with_env(
                 &mut store,
                 &env,
                 move |mut store: wasmer::FunctionEnvMut<EnvWrapper<T>>,
@@ -998,8 +1010,9 @@ pub mod imports {
                       arg9: i32|
                       -> Result<(), wasmer::RuntimeError> {
                     let _memory: wasmer::Memory = store.data().lazy.get().unwrap().memory.clone();
+                    let _memory_view = _memory.view(&store);
                     let mut _bc = wit_bindgen_wasmer::BorrowChecker::new(unsafe {
-                        _memory.data_unchecked_mut(&store)
+                        _memory_view.data_unchecked_mut()
                     });
                     let data_mut = store.data_mut();
                     let ptr0 = arg0;

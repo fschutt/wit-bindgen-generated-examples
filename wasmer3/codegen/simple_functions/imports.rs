@@ -24,10 +24,10 @@ pub mod simple_functions {
         /// This function returns the `SimpleFunctionsData` which needs to be
         /// passed through to `SimpleFunctions::new`.
         fn add_to_imports(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             imports: &mut wasmer::Imports,
         ) -> wasmer::FunctionEnv<SimpleFunctionsData> {
-            let env = wasmer::FunctionEnv::new(store, Default::default());
+            let env = wasmer::FunctionEnv::new(&mut store, SimpleFunctionsData::default());
             env
         }
 
@@ -42,12 +42,12 @@ pub mod simple_functions {
         /// both an instance of this structure and the underlying
         /// `wasmer::Instance` will be returned.
         pub fn instantiate(
-            store: &mut wasmer::StoreMut<'_>,
+            mut store: impl wasmer::AsStoreMut,
             module: &wasmer::Module,
             imports: &mut wasmer::Imports,
         ) -> anyhow::Result<(Self, wasmer::Instance)> {
-            let env = Self::add_to_imports(&mut store.as_store_mut().as_store_mut(), imports);
-            let instance = wasmer::Instance::new(&mut store.as_store_mut(), module, &*imports)?;
+            let env = Self::add_to_imports(&mut store, imports);
+            let instance = wasmer::Instance::new(&mut store, module, &*imports)?;
 
             Ok((Self::new(store, &instance, env)?, instance))
         }
@@ -60,14 +60,14 @@ pub mod simple_functions {
         /// and wrap them all up in the returned structure which can
         /// be used to interact with the wasm module.
         pub fn new(
-            store: &mut wasmer::StoreMut<'_>,
+            store: impl wasmer::AsStoreMut,
             _instance: &wasmer::Instance,
             env: wasmer::FunctionEnv<SimpleFunctionsData>,
         ) -> Result<Self, wasmer::ExportError> {
-            let func_f1 = _instance.exports.get_typed_function(store, "f1")?;
-            let func_f2 = _instance.exports.get_typed_function(store, "f2")?;
-            let func_f3 = _instance.exports.get_typed_function(store, "f3")?;
-            let func_f4 = _instance.exports.get_typed_function(store, "f4")?;
+            let func_f1 = _instance.exports.get_typed_function(&store, "f1")?;
+            let func_f2 = _instance.exports.get_typed_function(&store, "f2")?;
+            let func_f3 = _instance.exports.get_typed_function(&store, "f3")?;
+            let func_f4 = _instance.exports.get_typed_function(&store, "f4")?;
             Ok(SimpleFunctions {
                 func_f1,
                 func_f2,
